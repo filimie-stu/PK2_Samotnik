@@ -2,8 +2,8 @@
   "tasks": [
     {
       "type": "shell",
-      "label": "gcc build active file",
-      "command": "C:/msys64/mingw64/bin/gcc.exe",
+      "label": "build with make",
+      "command": "C:/msys64/mingw64/bin/mingw32-make.exe",
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -13,11 +13,6 @@
         "clear": false
       },
       "args": [
-        "-g3",
-        "-O0",
-        "${file}",
-        "-o",
-        "${fileDirname}\\${fileBasenameNoExtension}.exe"
       ],
       "group": {
         "kind": "build",
