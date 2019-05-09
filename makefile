@@ -1,5 +1,5 @@
-includes := 
-libraries := 
+includes := `pkg-config --cflags gtk+-3.0`
+libraries := `pkg-config --libs gtk+-3.0`
 bindir := bin
 debugflags := -g3 -O0 -Wall
 srcs := $(wildcard *.c)
