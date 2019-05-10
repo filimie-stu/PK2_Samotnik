@@ -25,14 +25,39 @@
                 <child>
                     <object class="GtkFrame" id="scoreFrame">
                         <property name="label">Score summary</property>
-
                         <property name="width-request">80</property>
                         <property name="height-request">125</property>
                         <property name="margin-top">5</property>
                         <property name="margin-bottom">5</property>
                         <property name="margin-start">5</property>
                         <property name="margin-end">5</property>
+                        <child>
+                            <object class="GtkGrid">
+                                <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+                                <child>
+                                    <object class="GtkLabel">
+                                        <property name="label">Takedowns:</property>
+                                    </object>
+                                </child>
+                                <child>
+                                    <object class="GtkLabel">
+                                        <property name="label">0</property>
+                                    </object>
+                                </child>
+                                <child>
+                                    <object class="GtkLabel">
+                                        <property name="label">Left to go:</property>
+                                    </object>
+                                </child>
+                                <child>
+                                    <object class="GtkLabel">
+                                        <property name="label">?</property>
+                                    </object>
+                                </child>
+                            </object>
+                        </child>
                     </object>
+
                     <packing>
                         <property name="left-attach">1</property>
                         <property name="top-attach">0</property>
