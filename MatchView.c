@@ -1,34 +1,55 @@
 #include "MatchView.h"
 #include "Board.h"
+#include "ClickEvent.h"
 #include <stdlib.h>
-
 
 void GameController_mainMenu(GameController* self);
 void GameController_restartGame(GameController* self);
+void GameController_clickBoard(GameController* self, Vector2D coords);
 
 typedef struct match_view 
 {
     GtkWidget* window;
+    GtkWidget* boardGrid;
     GtkWidget* mainMenuButton;
     GtkWidget* resetButton;
+    GameController* controllerAPI;
 } MatchView;
 static void private_mainMenu(GtkButton* button, gpointer data);
 static void private_restartGame(GtkButton* button, gpointer data);
-static void private_loadModel(GtkContainer* anchorPoint, Board* model);
+static void private_loadModel(MatchView* self, GtkContainer* anchorPoint, Board* model);
 
-GtkWidget *private_attachNewGridField(GtkGrid* boardGrid, int x, int y, const gchar *label)
+void private_attachNewGridField(MatchView* self, int x, int y, const gchar *label)
 {
     GtkWidget *button = gtk_button_new_with_label(label);
-    gtk_grid_attach(GTK_GRID(boardGrid), button, x, y, 1, 1);
-
-    return button;
+    gtk_grid_attach(GTK_GRID(self->boardGrid), button, x, y, 1, 1);
 }
 
-void private_loadModel(GtkContainer* anchorPoint, Board* model)
+void private_boardClicked(GtkButton* button, gpointer data)
 {
-    GtkWidget *boardGrid = gtk_grid_new();
+    ClickEvent* event = (ClickEvent*)data;
+    GameController_clickBoard((GameController*)(event->args), event->coords);
+}
+void private_configureBoardClickCallback(MatchView* self, int row, int column)
+{
+    GtkWidget* clickedField = gtk_grid_get_child_at(GTK_GRID(self->boardGrid), column, row);
 
-    gtk_container_add(anchorPoint, boardGrid);
+    Vector2D coords = {row, column};
+    ClickEvent* clickEvent = ClickEvent_new(self->controllerAPI, coords);
+    
+    g_signal_connect_data(
+        clickedField, 
+        "clicked", 
+        G_CALLBACK(private_boardClicked), 
+        clickEvent,
+        (GClosureNotify)ClickEvent_destroy,
+        0);
+}
+
+void private_loadModel(MatchView* self, GtkContainer* anchorPoint, Board* model)
+{
+    self->boardGrid = gtk_grid_new();
+    gtk_container_add(anchorPoint, self->boardGrid);
 
     for (int i = 0; i < model->dimensions.y; i++)
     {
@@ -39,8 +60,8 @@ void private_loadModel(GtkContainer* anchorPoint, Board* model)
                 continue;
 
             gchar label[2] = {FieldType_toChar(model->fields[i][j].contents), '\0'};
-            GtkWidget* gridField = private_attachNewGridField(GTK_GRID(boardGrid), j, i, label);
-            // private_configureCallback(self, j, i, gridField);
+            private_attachNewGridField(self, j, i, label);
+            private_configureBoardClickCallback(self, i, j);
         }
     }
 }
@@ -48,7 +69,7 @@ void private_loadModel(GtkContainer* anchorPoint, Board* model)
 MatchView* MatchView_new(GameController* controllerAPI, Board* board)
 {
     MatchView* created = (MatchView*)malloc(sizeof(MatchView));
-    
+    created->controllerAPI=controllerAPI;
     GtkBuilder* builder = gtk_builder_new();
     GError* error = NULL;
     if (gtk_builder_add_from_file(builder, "view/match_view.xml", &error) == 0)
@@ -62,14 +83,15 @@ MatchView* MatchView_new(GameController* controllerAPI, Board* board)
     g_signal_connect(created->mainMenuButton, "clicked", G_CALLBACK(private_mainMenu), controllerAPI);
 
     created->resetButton = GTK_WIDGET(gtk_builder_get_object(builder, "resetButton"));
-    g_signal_connect(created->mainMenuButton, "clicked", G_CALLBACK(private_restartGame), controllerAPI);
+    g_signal_connect(created->resetButton, "clicked", G_CALLBACK(private_restartGame), controllerAPI);
 
     GtkContainer* boardAnchorPoint = GTK_CONTAINER(gtk_builder_get_object(builder, "boardAnchorPoint"));
-    private_loadModel(boardAnchorPoint, board);
+    private_loadModel(created, boardAnchorPoint, board);
     return created;
 }
 void MatchView_destroy(MatchView* self)
 {
+    gtk_widget_destroy(self->window);
     free(self);
 }
 void MatchView_display(MatchView* self)

@@ -43,6 +43,7 @@ MainMenuView* MainMenuView_new(GameController* controllerAPI)
 }
 void MainMenuView_destroy(MainMenuView* self)
 {
+    gtk_widget_destroy(self->window);
     free(self);
 }
 void MainMenuView_display(MainMenuView* self)

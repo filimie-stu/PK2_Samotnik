@@ -3,10 +3,18 @@
 #include "Field.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 
 static int private_loadDimensions(Board *incompleteSelf, FILE *sourceFile);
 static int private_loadFields(Board *incompleteSelf, FILE *sourceFile);
+static ClickResult private_determineAction(Board* self, Vector2D clickCoords);
+static Field* private_fieldAt(Board* self, Vector2D at);
+static int private_canActivate(Board* self, Vector2D clickedCoords);
+static int private_canJump(Board* self, Vector2D clickedCoords);
+static void private_takedownAt(Board* self, Vector2D at);
+static void private_transferActiveToken(Board* self, Vector2D dst);
+static void private_jump(Board *self, Vector2D dstCoords);
 
 Board* Board_newFromFile(const char* relativePath)
 {
@@ -43,6 +51,24 @@ void Board_destroy(Board* self)
     free(self);
 }
 
+ClickResult Board_clickField(Board* self, Vector2D coords)
+{
+    ClickResult action = private_determineAction(self, coords);
+    switch (action)
+    {
+    case ACTIVATE_TOKEN:
+        private_fieldAt(self, coords)->contents = ACTIVE_TOKEN;
+        break;
+    
+    case JUMP:
+        private_jump(self, coords);
+        break;
+    default:
+        break;
+    }
+
+    return action;
+}
 
 int private_loadDimensions(Board *incompleteSelf, FILE *sourceFile)
 {
@@ -50,6 +76,7 @@ int private_loadDimensions(Board *incompleteSelf, FILE *sourceFile)
         return 1;
     return 0;
 }
+
 
 int private_loadFields(Board *incompleteSelf, FILE *sourceFile)
 {
@@ -76,3 +103,65 @@ int private_loadFields(Board *incompleteSelf, FILE *sourceFile)
     }
     return 0;
 }
+
+Field* private_fieldAt(Board* self, Vector2D at)
+{
+    return &self->fields[at.x][at.y];
+}
+
+ClickResult private_determineAction(Board* self, Vector2D clickCoords )
+{
+    if (private_canJump(self, clickCoords))
+        return JUMP;
+    
+    if (private_canActivate(self, clickCoords))
+        return ACTIVATE_TOKEN;
+
+    return NO_ACTION;
+}
+
+int private_canActivate(Board* self, Vector2D clickedCoords)
+{
+    if (private_fieldAt(self, clickedCoords)->contents == REGULAR_TOKEN)
+        return 1;
+    return 0;
+}
+
+int private_canJump(Board* self, Vector2D clickedCoords)
+{
+    if (!self->activeField)
+        return 0;
+
+    int destinationEmpty = 
+        private_fieldAt(self, clickedCoords)->contents == EMPTY;
+    int fieldsInLine = 
+        self->activeField->coords.x == clickedCoords.x || 
+        self->activeField->coords.y == clickedCoords.y;
+    int rightDistance = 
+        abs(self->activeField->coords.x - clickedCoords.x) == 2 ||
+        abs(self->activeField->coords.y - clickedCoords.y) == 2; 
+    
+    Vector2D attackedCoords = Vector2D_calculateMidpoint(self->activeField->coords, clickedCoords);
+    int tokenBetween = 
+        private_fieldAt(self, attackedCoords)->contents == REGULAR_TOKEN;
+
+    return destinationEmpty * fieldsInLine * rightDistance * tokenBetween;
+}
+void private_jump(Board *self, Vector2D dstCoords)
+{
+    Vector2D attackedCoords = Vector2D_calculateMidpoint(self->activeField->coords, dstCoords);
+    private_takedownAt(self, attackedCoords);
+    private_transferActiveToken(self, dstCoords);
+}
+
+void private_takedownAt(Board* self, Vector2D at)
+{
+    private_fieldAt(self, at)->contents = EMPTY;
+}
+void private_transferActiveToken(Board* self, Vector2D dst)
+{
+    self->activeField->contents = EMPTY;
+    self->activeField = NULL;
+    private_fieldAt(self, dst)->contents = REGULAR_TOKEN;
+}
+
