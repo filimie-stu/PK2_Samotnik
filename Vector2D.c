@@ -1,6 +1,11 @@
 #include "Vector2D.h"
 #include <math.h>
 
+Vector2D Vector2D_create(int x, int y)
+{
+    Vector2D created = {x,y};
+    return created;
+}
 
 Vector2D Vector2D_calculateMidpoint(Vector2D first, Vector2D second)
 {

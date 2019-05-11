@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "Vector2D.h"
 #include "Field.h"
+#include "Observable.h"
 
 typedef enum
 {
@@ -10,6 +11,7 @@ typedef enum
 
 typedef struct board 
 {
+    Observable* observable;
     Vector2D dimensions;
     Field** fields;
     Field* activeField;

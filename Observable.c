@@ -8,11 +8,11 @@ typedef struct observable
     void *implementationObj;
 } Observable;
 
-void Observable_notifyObservers(Observable *self, void *signalArgs)
+void Observable_notifyObservers(Observable *self, const char* signalID, void *signalArgs)
 {
     for (int i = 0; i < self->observersCount; i++)
     {
-        Observer_notify(self->observers[i], self, signalArgs);
+        Observer_notify(self->observers[i], signalID, signalArgs);
     }
 }
 

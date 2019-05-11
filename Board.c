@@ -1,6 +1,9 @@
+#include "JumpArgs.h"
+#include "ActivateArgs.h"
 #include "Board.h"
 #include "Vector2D.h"
 #include "Field.h"
+#include "Observable.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -21,6 +24,7 @@ Board* Board_newFromFile(const char* relativePath)
     Board *created = (Board *)malloc(sizeof(Board));
     created->activeField = NULL;
     created->tokenCount = 0;
+    created->observable = Observable_new(created);
 
     FILE *file;
     if (fopen_s(&file, relativePath, "r") != 0)
@@ -51,13 +55,34 @@ void Board_destroy(Board* self)
     free(self);
 }
 
+void private_activateAt(Board* self, Vector2D at)
+{
+    ActivateArgs args;
+
+    if (self->activeField)
+    {
+        self->activeField->contents = REGULAR_TOKEN;
+        args.previouslyActive = self->activeField->coords;
+    }
+    else
+    {
+        args.previouslyActive.x = -1;
+        args.previouslyActive.y = -1;
+    }
+    
+    self->activeField = private_fieldAt(self, at);
+    self->activeField->contents = ACTIVE_TOKEN;
+
+    args.activated = self->activeField->coords;
+    Observable_notifyObservers(self->observable, "activate_token", &args);
+}
 ClickResult Board_clickField(Board* self, Vector2D coords)
 {
     ClickResult action = private_determineAction(self, coords);
     switch (action)
     {
     case ACTIVATE_TOKEN:
-        private_fieldAt(self, coords)->contents = ACTIVE_TOKEN;
+        private_activateAt(self, coords);
         break;
     
     case JUMP:
@@ -150,8 +175,12 @@ int private_canJump(Board* self, Vector2D clickedCoords)
 void private_jump(Board *self, Vector2D dstCoords)
 {
     Vector2D attackedCoords = Vector2D_calculateMidpoint(self->activeField->coords, dstCoords);
+    JumpArgs eventArgs = { self->activeField->coords, attackedCoords, dstCoords };
+    Observable_notifyObservers(self->observable, "jump", &eventArgs);
+
     private_takedownAt(self, attackedCoords);
     private_transferActiveToken(self, dstCoords);
+
 }
 
 void private_takedownAt(Board* self, Vector2D at)

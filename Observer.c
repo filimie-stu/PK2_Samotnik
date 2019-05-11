@@ -4,12 +4,12 @@
 typedef struct observer
 {
     void *implementationObj;
-    notifyFnOverride notifyOverride;
+    void (*notifyOverride)(void* implementationObj, const char* signalID, void * signalArgs); 
 
 } Observer;
 
 
-Observer* Observer_new(void* implementationObj, notifyFnOverride notifyOverride, Observable* src)
+Observer* Observer_new(void* implementationObj, void(*notifyOverride)(void* implObject, const char* sigID, void* sigArgs), Observable* src)
 {
     Observer* created = (Observer*)malloc(sizeof(Observer));
     created->implementationObj = implementationObj;
@@ -23,7 +23,7 @@ void Observer_dispose(Observer* self)
 {
     free(self);
 }
-void Observer_notify(Observer* self, Observable* signalSrc, void* signalArgs)
+void Observer_notify(Observer* self, const char* signalID, void* signalArgs)
 {
-    self->notifyOverride(self->implementationObj, signalSrc, signalArgs);
+    self->notifyOverride(self->implementationObj, signalID, signalArgs);
 }
