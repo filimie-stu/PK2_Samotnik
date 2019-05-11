@@ -1,11 +1,13 @@
 #include "GameController.h"
 #include "MainMenuView.h"
 #include "MatchView.h"
+#include "Board.h"
 #include <stdlib.h>
 
 
 typedef struct game_controller
 {
+    Board* board;
     MatchView* currentMatchView;
     MainMenuView* currentMainMenuView;
 } GameController;
@@ -15,6 +17,7 @@ GameController* GameController_new()
     GameController* created = (GameController*)malloc(sizeof(GameController));
     created->currentMainMenuView = NULL;
     created->currentMatchView = NULL;
+    created->board = NULL;
     return created;
 }
 void GameController_destroy(GameController* self)
@@ -57,9 +60,12 @@ void GameController_beginMatch(GameController* self)
     if (self->currentMatchView)
     {
         MatchView_destroy(self->currentMatchView);
-        self->currentMatchView = NULL;
     }
-
-    self->currentMatchView = MatchView_new(self);
+    if (self->board)
+    {
+        Board_destroy(self->board);
+    }
+    self->board = Board_newFromFile("data/board.txt");
+    self->currentMatchView = MatchView_new(self, self->board);
     MatchView_display(self->currentMatchView);
 }
