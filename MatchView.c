@@ -138,6 +138,7 @@ MatchView *MatchView_new(GameController *controllerAPI, Board *board, Score* sco
         g_printerr("Error during loading file: %s\n", error->message);
         g_clear_error(&error);
     }
+
     created->window = GTK_WIDGET(gtk_builder_get_object(builder, "matchWindow"));
     created->takedownsCounter = GTK_WIDGET(gtk_builder_get_object(builder, "takedownsCounter"));
     created->tokensLeftCounter = GTK_WIDGET(gtk_builder_get_object(builder, "tokensLeftCounter"));
@@ -149,6 +150,8 @@ MatchView *MatchView_new(GameController *controllerAPI, Board *board, Score* sco
 
     GtkContainer *boardAnchorPoint = GTK_CONTAINER(gtk_builder_get_object(builder, "boardAnchorPoint"));
     private_loadModel(created, boardAnchorPoint, board);
+    SyncScoreArgs initialScore = { score->takedowns, score->goal - score->takedowns };
+    private_syncScore(created, initialScore);
     return created;
 }
 void MatchView_destroy(MatchView *self)
