@@ -4,6 +4,7 @@
 #include "Observer.h"
 #include "JumpArgs.h"
 #include "ActivateArgs.h"
+#include "SyncScoreArgs.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -17,11 +18,15 @@ typedef struct match_view
     GtkWidget *boardGrid;
     GtkWidget *mainMenuButton;
     GtkWidget *resetButton;
+    GtkWidget *tokensLeftCounter;
+    GtkWidget *takedownsCounter;
 
     GameController *controllerAPI;
-    Observer *observer;
+    Observer *boardObserver;
+    Observer *scoreObserver;
 
 } MatchView;
+
 static void private_mainMenu(GtkButton *button, gpointer data);
 static void private_restartGame(GtkButton *button, gpointer data);
 static void private_loadModel(MatchView *self, GtkContainer *anchorPoint, Board *model);
@@ -81,6 +86,18 @@ void private_updateAt(MatchView* self, Vector2D at, const char* newLabel)
         gtk_button_set_label(GTK_BUTTON(cell), newLabel);
 }
 
+void private_syncScore(MatchView* self, SyncScoreArgs args)
+{
+    char takedownsStr[3] = { '\0','\0','\0' };
+    sprintf_s(takedownsStr, sizeof(takedownsStr), "%d", args.takedowns);
+    gtk_label_set_label(GTK_LABEL(self->takedownsCounter), takedownsStr);
+    
+    char leftStr[3] = { '\0','\0','\0' };
+    sprintf_s(leftStr, sizeof(leftStr), "%d", args.tokensLeft);
+    gtk_label_set_label(GTK_LABEL(self->tokensLeftCounter), leftStr);
+
+}
+
 void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
 {
     if (strncmp(signalID, "activate_token", strlen(signalID)) == 0)
@@ -99,14 +116,22 @@ void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
         private_updateAt(self, args.through, "_");
         private_updateAt(self, args.to, "o");
     }
+    else if (strncmp(signalID, "sync_score", strlen(signalID)) == 0)
+    {
+        MatchView *self = (MatchView *)vSelf;
+        SyncScoreArgs args = *(SyncScoreArgs*)signalArgs;
+        private_syncScore(self, args);
+    }   
 }
 
-MatchView *MatchView_new(GameController *controllerAPI, Board *board)
+MatchView *MatchView_new(GameController *controllerAPI, Board *board, Score* score)
 {
     MatchView *created = (MatchView *)malloc(sizeof(MatchView));
     created->controllerAPI = controllerAPI;
-    created->observer = Observer_new(created, private_recieveSignal, board->observable);
+    created->boardObserver = Observer_new(created, private_recieveSignal, board->observable);
+    created->scoreObserver = Observer_new(created, private_recieveSignal, score->observable);
     GtkBuilder *builder = gtk_builder_new();
+
     GError *error = NULL;
     if (gtk_builder_add_from_file(builder, "view/match_view.xml", &error) == 0)
     {
@@ -114,7 +139,8 @@ MatchView *MatchView_new(GameController *controllerAPI, Board *board)
         g_clear_error(&error);
     }
     created->window = GTK_WIDGET(gtk_builder_get_object(builder, "matchWindow"));
-
+    created->takedownsCounter = GTK_WIDGET(gtk_builder_get_object(builder, "takedownsCounter"));
+    created->tokensLeftCounter = GTK_WIDGET(gtk_builder_get_object(builder, "tokensLeftCounter"));
     created->mainMenuButton = GTK_WIDGET(gtk_builder_get_object(builder, "mainMenuButton"));
     g_signal_connect(created->mainMenuButton, "clicked", G_CALLBACK(private_mainMenu), controllerAPI);
 

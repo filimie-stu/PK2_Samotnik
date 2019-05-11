@@ -41,7 +41,7 @@
                                     </object>
                                 </child>
                                 <child>
-                                    <object class="GtkLabel">
+                                    <object class="GtkLabel" id="takedownsCounter">
                                         <property name="label">0</property>
                                     </object>
                                 </child>
@@ -51,7 +51,7 @@
                                     </object>
                                 </child>
                                 <child>
-                                    <object class="GtkLabel">
+                                    <object class="GtkLabel" id="tokensLeftCounter">
                                         <property name="label">?</property>
                                     </object>
                                 </child>
