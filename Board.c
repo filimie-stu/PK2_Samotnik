@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <assert.h>
 
 
 static int private_loadDimensions(Board *incompleteSelf, FILE *sourceFile);
@@ -17,7 +18,7 @@ static Field* private_fieldAt(Board* self, Vector2D at);
 static int private_canActivate(Board* self, Vector2D clickedCoords);
 static int private_canJump(Board* self, Vector2D clickedCoords);
 static void private_takedownAt(Board* self, Vector2D at);
-static void private_transferActiveToken(Board* self, Vector2D dst);
+static void private_transferToken(Board* self, Vector2D dst);
 static void private_jump(Board *self, Vector2D dstCoords);
 
 Board* Board_newFromFile(const char* relativePath)
@@ -163,14 +164,16 @@ int private_canActivate(Board* self, Vector2D clickedCoords)
 
 Field* private_getNeighbourOf(Board* self, Field* field, Direction dir)
 {
+    assert(field!=NULL);
+
     Vector2D coords = field->coords;
     switch (dir)
     {
     case UP:
-        return private_fieldAt(self, Vector2D_create(coords.x + 1, coords.y));
+        return private_fieldAt(self, Vector2D_create(coords.x - 1, coords.y));
     
     case DOWN:
-        return private_fieldAt(self, Vector2D_create(coords.x - 1, coords.y));
+        return private_fieldAt(self, Vector2D_create(coords.x + 1, coords.y));
 
     case LEFT:
         return private_fieldAt(self, Vector2D_create(coords.x, coords.y - 1));
@@ -178,35 +181,64 @@ Field* private_getNeighbourOf(Board* self, Field* field, Direction dir)
     case RIGHT:
         return private_fieldAt(self, Vector2D_create(coords.x, coords.y + 1));
     default:
+        assert(0 && "We should never stop here.\n");
         return NULL;
     }
 }
 
-void private_getJumpableFields(Board* self, Field* out_fields[4])
+void private_getJumpableFields(Board* self, Field* from, Field* out_fields[4])
 {
-    if (!self->activeField)
-    {
-        perror("Cannot find jumpable fields, since there's no active field.\n");
-        return;
-    }
+    assert(from != NULL);
     
     for (Direction dir = 0; dir < 4; dir++)
     {
-        Field* attackedField = private_getNeighbourOf(self, self->activeField, dir);
+        Field* attackedField = private_getNeighbourOf(self, from, dir);
         if (attackedField != NULL && attackedField->contents == REGULAR_TOKEN)
         {
             Field* jumpDestination = private_getNeighbourOf(self, attackedField, dir);
             if (jumpDestination != NULL && jumpDestination->contents == EMPTY)
             {
                 out_fields[(int)dir] = jumpDestination;
-            }
-            else
-            {
-                out_fields[(int)dir] = NULL;
+                return;
             }
         }
+        out_fields[(int)dir] = NULL;
     }
     
+}
+
+int private_jumpsPossibleFrom(Board* self, Field* from)
+{
+    if (from->contents != REGULAR_TOKEN)
+    {
+        return 0;
+    }
+    
+    Field* jumpableFields[4];
+    private_getJumpableFields(self, from, jumpableFields);
+    
+    for (int i = 0; i < 4; i++)
+    {
+        if (jumpableFields[i] != NULL)
+        {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+int private_isDeadEndState(Board* self)
+{
+    for (int i = 0; i < self->dimensions.x; i++)
+    {
+        for (int j = 0; j < self->dimensions.y; j++)
+        {
+            Field* field = private_fieldAt(self, Vector2D_create(i,j)); 
+            if (private_jumpsPossibleFrom(self, field))
+                return 0;
+        }
+    }
+    return 1;
 }
 
 int private_canJump(Board* self, Vector2D clickedCoords)
@@ -215,7 +247,7 @@ int private_canJump(Board* self, Vector2D clickedCoords)
         return 0;
     
     Field* jumpableFields[4];
-    private_getJumpableFields(self, jumpableFields);
+    private_getJumpableFields(self, self->activeField, jumpableFields);
     Field* clickedField = private_fieldAt(self, clickedCoords);
     
     for (int i = 0; i < 4; i++)
@@ -233,15 +265,19 @@ void private_jump(Board *self, Vector2D dstCoords)
     Observable_notifyObservers(self->observable, "jump", &eventArgs);
 
     private_takedownAt(self, attackedCoords);
-    private_transferActiveToken(self, dstCoords);
+    private_transferToken(self, dstCoords);
 
+    if (private_isDeadEndState(self))
+    {
+        Observable_notifyObservers(self->observable, "dead_end", &eventArgs);
+    }
 }
 
 void private_takedownAt(Board* self, Vector2D at)
 {
     private_fieldAt(self, at)->contents = EMPTY;
 }
-void private_transferActiveToken(Board* self, Vector2D dst)
+void private_transferToken(Board* self, Vector2D dst)
 {
     self->activeField->contents = EMPTY;
     self->activeField = NULL;

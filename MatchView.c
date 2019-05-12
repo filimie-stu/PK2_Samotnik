@@ -121,7 +121,11 @@ void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
         MatchView *self = (MatchView *)vSelf;
         SyncScoreArgs args = *(SyncScoreArgs*)signalArgs;
         private_syncScore(self, args);
-    }   
+    }
+    else if (strncmp(signalID, "dead_end", strlen(signalID)) == 0)
+    {
+        printf("GAME OVER GAME OVER\n");
+    }
 }
 
 MatchView *MatchView_new(GameController *controllerAPI, Board *board, Score* score)

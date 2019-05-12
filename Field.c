@@ -41,7 +41,7 @@ char FieldType_toChar(FieldType ft)
         case FORBIDDEN:
             return '#';
         default:
-            perror("Unrecognized field type. Failed to convert to char.\n");
+            printf("%d: Unrecognized field type. Failed to convert to char.\n", (int)ft);
             return '?';
     }
 }
