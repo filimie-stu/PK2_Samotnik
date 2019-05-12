@@ -13,6 +13,11 @@
                             <object class="GtkButtonBox">
                                 <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
                                 <child>
+                                    <object class="GtkButton" id="continueButton">
+                                        <property name="label">Continue</property>
+                                    </object>
+                                </child>
+                                <child>
                                     <object class="GtkButton" id="newGameButton">
                                         <property name="label">New game</property>
                                     </object>

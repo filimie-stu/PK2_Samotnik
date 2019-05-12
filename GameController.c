@@ -25,6 +25,19 @@ GameController* GameController_new()
     created->score = NULL;
     return created;
 }
+
+void GameController_continueMatch(GameController* self)
+{
+    if (!self->currentMatchView)
+    {
+        perror("Error: no ongoing match to continue.\n");
+        return;
+    }
+
+    MainMenuView_hide(self->currentMainMenuView);
+    MatchView_display(self->currentMatchView);
+}
+
 void GameController_destroy(GameController* self)
 {
     if (self->currentMatchView)
@@ -40,13 +53,24 @@ void GameController_destroy(GameController* self)
 
 void GameController_mainMenu(GameController* self)
 {
-    if (self->currentMatchView)
-        MatchView_hide(self->currentMatchView);
-
     if (!self->currentMainMenuView)
+    {
         self->currentMainMenuView = MainMenuView_new(self);
-    
+    }
+
+
     MainMenuView_display(self->currentMainMenuView);
+
+    if (self->currentMatchView)
+    {
+        MatchView_hide(self->currentMatchView);
+        MainMenuView_displayContinueButton(self->currentMainMenuView);
+    } 
+    else
+    {
+        MainMenuView_hideContinueButton(self->currentMainMenuView);
+    }
+
 }
 
 void GameController_prepareForExit(GameController* self)

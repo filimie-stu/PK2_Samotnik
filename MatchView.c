@@ -150,6 +150,7 @@ MatchView *MatchView_new(GameController *controllerAPI, Board *board, Score* sco
 
     GtkContainer *boardAnchorPoint = GTK_CONTAINER(gtk_builder_get_object(builder, "boardAnchorPoint"));
     private_loadModel(created, boardAnchorPoint, board);
+    
     SyncScoreArgs initialScore = { score->takedowns, score->goal - score->takedowns };
     private_syncScore(created, initialScore);
     return created;
