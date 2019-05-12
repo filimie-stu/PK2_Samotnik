@@ -33,15 +33,15 @@ MainMenuView* MainMenuView_new(GameController* controllerAPI)
 
     GtkBuilder* builder = gtk_builder_new();
     GError* error = NULL;
-    if (gtk_builder_add_from_file(builder, "view/main_menu_view.xml", &error) == 0)
+    if (gtk_builder_add_from_file(builder, "view/main_menu_view.glade", &error) == 0)
     {
         g_printerr("Error during loading file: %s\n", error->message);
         g_clear_error(&error);
     }
     created->window = GTK_WIDGET(gtk_builder_get_object(builder, "mainMenuWindow"));
-    created->exitBtn = GTK_WIDGET(gtk_builder_get_object(builder, "exitButton"));
-    created->newGameBtn = GTK_WIDGET(gtk_builder_get_object(builder, "newGameButton"));
-    created->continueBtn = GTK_WIDGET(gtk_builder_get_object(builder, "continueButton"));
+    created->exitBtn = GTK_WIDGET(gtk_builder_get_object(builder, "exitBtn"));
+    created->newGameBtn = GTK_WIDGET(gtk_builder_get_object(builder, "newGameBtn"));
+    created->continueBtn = GTK_WIDGET(gtk_builder_get_object(builder, "continueBtn"));
     g_signal_connect(created->exitBtn, "clicked", G_CALLBACK(private_exitProgram), controllerAPI);
     g_signal_connect(created->newGameBtn, "clicked", G_CALLBACK(private_beginMatch), controllerAPI);
     g_signal_connect(created->continueBtn, "clicked", G_CALLBACK(private_continueMatch), controllerAPI);

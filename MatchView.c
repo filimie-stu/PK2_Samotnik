@@ -137,19 +137,19 @@ MatchView *MatchView_new(GameController *controllerAPI, Board *board, Score* sco
     GtkBuilder *builder = gtk_builder_new();
 
     GError *error = NULL;
-    if (gtk_builder_add_from_file(builder, "view/match_view.xml", &error) == 0)
+    if (gtk_builder_add_from_file(builder, "view/in_game_view.glade", &error) == 0)
     {
         g_printerr("Error during loading file: %s\n", error->message);
         g_clear_error(&error);
     }
 
-    created->window = GTK_WIDGET(gtk_builder_get_object(builder, "matchWindow"));
+    created->window = GTK_WIDGET(gtk_builder_get_object(builder, "inGameWindow"));
     created->takedownsCounter = GTK_WIDGET(gtk_builder_get_object(builder, "takedownsCounter"));
     created->tokensLeftCounter = GTK_WIDGET(gtk_builder_get_object(builder, "tokensLeftCounter"));
-    created->mainMenuButton = GTK_WIDGET(gtk_builder_get_object(builder, "mainMenuButton"));
+    created->mainMenuButton = GTK_WIDGET(gtk_builder_get_object(builder, "mainMenuBtn"));
     g_signal_connect(created->mainMenuButton, "clicked", G_CALLBACK(private_mainMenu), controllerAPI);
 
-    created->resetButton = GTK_WIDGET(gtk_builder_get_object(builder, "resetButton"));
+    created->resetButton = GTK_WIDGET(gtk_builder_get_object(builder, "restartBtn"));
     g_signal_connect(created->resetButton, "clicked", G_CALLBACK(private_restartGame), controllerAPI);
 
     GtkContainer *boardAnchorPoint = GTK_CONTAINER(gtk_builder_get_object(builder, "boardAnchorPoint"));
