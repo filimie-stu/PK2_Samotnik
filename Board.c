@@ -1,6 +1,7 @@
 #include "JumpArgs.h"
 #include "ActivateArgs.h"
 #include "Board.h"
+#include "Common.h"
 #include "Vector2D.h"
 #include "Field.h"
 #include "Observable.h"
@@ -95,6 +96,8 @@ ClickResult Board_clickField(Board* self, Vector2D coords)
     return action;
 }
 
+
+
 int private_loadDimensions(Board *incompleteSelf, FILE *sourceFile)
 {
     if (fscanf(sourceFile, "%d %d ", &incompleteSelf->dimensions.y, &incompleteSelf->dimensions.x) < 2)
@@ -131,6 +134,12 @@ int private_loadFields(Board *incompleteSelf, FILE *sourceFile)
 
 Field* private_fieldAt(Board* self, Vector2D at)
 {
+    if (self->dimensions.x <= at.x || 
+        self->dimensions.y <= at.y || 
+        at.x < 0 || 
+        at.y < 0)
+        return NULL;
+
     return &self->fields[at.x][at.y];
 }
 
@@ -152,25 +161,70 @@ int private_canActivate(Board* self, Vector2D clickedCoords)
     return 0;
 }
 
+Field* private_getNeighbourOf(Board* self, Field* field, Direction dir)
+{
+    Vector2D coords = field->coords;
+    switch (dir)
+    {
+    case UP:
+        return private_fieldAt(self, Vector2D_create(coords.x + 1, coords.y));
+    
+    case DOWN:
+        return private_fieldAt(self, Vector2D_create(coords.x - 1, coords.y));
+
+    case LEFT:
+        return private_fieldAt(self, Vector2D_create(coords.x, coords.y - 1));
+
+    case RIGHT:
+        return private_fieldAt(self, Vector2D_create(coords.x, coords.y + 1));
+    default:
+        return NULL;
+    }
+}
+
+void private_getJumpableFields(Board* self, Field* out_fields[4])
+{
+    if (!self->activeField)
+    {
+        perror("Cannot find jumpable fields, since there's no active field.\n");
+        return;
+    }
+    
+    for (Direction dir = 0; dir < 4; dir++)
+    {
+        Field* attackedField = private_getNeighbourOf(self, self->activeField, dir);
+        if (attackedField != NULL && attackedField->contents == REGULAR_TOKEN)
+        {
+            Field* jumpDestination = private_getNeighbourOf(self, attackedField, dir);
+            if (jumpDestination != NULL && jumpDestination->contents == EMPTY)
+            {
+                out_fields[(int)dir] = jumpDestination;
+            }
+            else
+            {
+                out_fields[(int)dir] = NULL;
+            }
+        }
+    }
+    
+}
+
 int private_canJump(Board* self, Vector2D clickedCoords)
 {
     if (!self->activeField)
         return 0;
-
-    int destinationEmpty = 
-        private_fieldAt(self, clickedCoords)->contents == EMPTY;
-    int fieldsInLine = 
-        self->activeField->coords.x == clickedCoords.x || 
-        self->activeField->coords.y == clickedCoords.y;
-    int rightDistance = 
-        abs(self->activeField->coords.x - clickedCoords.x) == 2 ||
-        abs(self->activeField->coords.y - clickedCoords.y) == 2; 
     
-    Vector2D attackedCoords = Vector2D_calculateMidpoint(self->activeField->coords, clickedCoords);
-    int tokenBetween = 
-        private_fieldAt(self, attackedCoords)->contents == REGULAR_TOKEN;
+    Field* jumpableFields[4];
+    private_getJumpableFields(self, jumpableFields);
+    Field* clickedField = private_fieldAt(self, clickedCoords);
+    
+    for (int i = 0; i < 4; i++)
+    {
+        if (clickedField == jumpableFields[i])
+            return 1;
+    }
 
-    return destinationEmpty * fieldsInLine * rightDistance * tokenBetween;
+    return 0;
 }
 void private_jump(Board *self, Vector2D dstCoords)
 {
