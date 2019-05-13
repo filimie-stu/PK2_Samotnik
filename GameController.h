@@ -10,3 +10,4 @@ void GameController_beginMatch(GameController* self);
 void GameController_restartGame(GameController* self);
 void GameController_clickBoard(GameController* self, Vector2D coords);
 void GameController_continueMatch(GameController* self);
+void GameController_endMatch(GameController* self);

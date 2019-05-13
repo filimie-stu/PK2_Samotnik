@@ -1,4 +1,5 @@
 #include "MainMenuView.h"
+#include "HowToPlayView.h"
 #include <stdlib.h>
 
 
@@ -12,8 +13,11 @@ typedef struct main_menu_view
     GtkWidget* window;
     GtkWidget* continueBtn;
     GtkWidget* newGameBtn;
+    GtkWidget* howToPlayBtn;
     GtkWidget* exitBtn;
+    
     GameController* controllerAPI;
+    HowToPlayView* howToPlayView;
 
 } MainMenuView;
 
@@ -26,6 +30,10 @@ void private_continueMatch(GtkButton* button, gpointer data)
     GameController_continueMatch((GameController*)data);
 }
 
+void private_displayHowToPlay(GtkButton* button, gpointer data)
+{
+    HowToPlayView_display((HowToPlayView*)data);
+}
 MainMenuView* MainMenuView_new(GameController* controllerAPI)
 {
     MainMenuView* created = (MainMenuView*)malloc(sizeof(MainMenuView));
@@ -42,9 +50,13 @@ MainMenuView* MainMenuView_new(GameController* controllerAPI)
     created->exitBtn = GTK_WIDGET(gtk_builder_get_object(builder, "exitBtn"));
     created->newGameBtn = GTK_WIDGET(gtk_builder_get_object(builder, "newGameBtn"));
     created->continueBtn = GTK_WIDGET(gtk_builder_get_object(builder, "continueBtn"));
+    created->howToPlayBtn = GTK_WIDGET(gtk_builder_get_object(builder, "howToPlayBtn"));
+
+    created->howToPlayView = HowToPlayView_new(controllerAPI, GTK_WINDOW(created->window));
     g_signal_connect(created->exitBtn, "clicked", G_CALLBACK(private_exitProgram), controllerAPI);
     g_signal_connect(created->newGameBtn, "clicked", G_CALLBACK(private_beginMatch), controllerAPI);
     g_signal_connect(created->continueBtn, "clicked", G_CALLBACK(private_continueMatch), controllerAPI);
+    g_signal_connect(created->howToPlayBtn, "clicked", G_CALLBACK(private_displayHowToPlay), created->howToPlayView);
     
     return created;
 }

@@ -1,0 +1,115 @@
+<interface>
+    <object class="GtkDialog" id="howToPlayDialog">
+        <property name="can_focus">False</property>
+        <property name="border_width">7</property>
+        <property name="title" translatable="yes">How to play</property>
+        <property name="resizable">False</property>
+        <property name="modal">True</property>
+        <property name="window_position">center-on-parent</property>
+        <property name="default_width">600</property>
+        <property name="default_height">400</property>
+        <property name="destroy_with_parent">True</property>
+        <property name="type_hint">dialog</property>
+        <child internal-child="vbox">
+            <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <child internal-child="action_area">
+                    <object class="GtkButtonBox">
+                        <property name="orientation">horizontal</property>
+                        <child>
+                            <object class="GtkButton" id="okBtn">
+                                <property name="label">Ok, got it!</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">True</property>
+                            </object>
+                        </child>
+                    </object>
+                </child>
+                <child>
+                    <object class="GtkGrid">
+                        <child>
+                            <object class="GtkFrame">
+                                <property name="margin-top">15</property>
+                                <property name="margin-bottom">15</property>
+                                <property name="margin-start">15</property>
+                                <property name="margin-end">15</property>
+                                <child>
+                                    <object class="GtkImage" id="stepOneImg">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="stock">gtk-missing-image</property>
+                                    </object>
+                                </child>
+                            </object>
+                            <packing>
+                                <property name="left-attach">0</property>
+                                <property name="top-attach">0</property>
+                            </packing>
+                        </child>
+                        <child>
+                            <object class="GtkFrame">
+                                <property name="margin-top">15</property>
+                                <property name="margin-bottom">15</property>
+                                <property name="margin-start">15</property>
+                                <property name="margin-end">15</property>
+                                <child>
+                                    <object class="GtkImage" id="stepTwoImg">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="stock">gtk-missing-image</property>
+                                    </object>
+                                </child>
+                            </object>
+                            <packing>
+                                <property name="left-attach">1</property>
+                                <property name="top-attach">0</property>
+                            </packing>
+                        </child>
+                        <child>
+                            <object class="GtkFrame">
+                                <property name="margin-top">15</property>
+                                <property name="margin-bottom">15</property>
+                                <property name="margin-start">15</property>
+                                <property name="margin-end">15</property>
+                                <child>
+                                    <object class="GtkImage" id="stepThreeImg">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="stock">gtk-missing-image</property>
+                                    </object>
+                                </child>
+                            </object>
+                            <packing>
+                                <property name="left-attach">0</property>
+                                <property name="top-attach">1</property>
+                            </packing>
+                        </child>
+                        <child>
+                            <object class="GtkFrame">
+                                <property name="margin-top">15</property>
+                                <property name="margin-bottom">15</property>
+                                <property name="margin-start">15</property>
+                                <property name="margin-end">15</property>
+                                <child>
+                                    <object class="GtkImage" id="stepFourImg">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="stock">gtk-missing-image</property>
+                                    </object>
+                                </child>
+                            </object>
+                            <packing>
+                                <property name="left-attach">1</property>
+                                <property name="top-attach">1</property>
+                            </packing>
+                        </child>
+                    </object>
+                </child>
+            </object>
+        </child>
+        <action-widgets>
+            <action-widget response="ok">okBtn</action-widget>
+        </action-widgets>
+    </object>
+</interface>

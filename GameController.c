@@ -1,5 +1,6 @@
 #include "GameController.h"
 #include "MainMenuView.h"
+#include "HowToPlayView.h"
 #include "Observer.h"
 #include "MatchView.h"
 #include "Board.h"
@@ -15,7 +16,20 @@ typedef struct game_controller
     Observer* observingBoard;
     MatchView* currentMatchView;
     MainMenuView* currentMainMenuView;
+
 } GameController;
+
+static int private_gameGoing(GameController* self);
+
+void GameController_endMatch(GameController* self)
+{
+    Board_destroy(self->board);
+    self->board = NULL;
+    MatchView_destroy(self->currentMatchView);
+    self->currentMatchView = NULL;
+}
+
+
 
 GameController* GameController_new()
 {
@@ -25,6 +39,7 @@ GameController* GameController_new()
     created->currentMatchView = NULL;
     created->board = NULL;
     created->score = NULL;
+
     return created;
 }
 
@@ -63,7 +78,7 @@ void GameController_mainMenu(GameController* self)
 
     MainMenuView_display(self->currentMainMenuView);
 
-    if (self->currentMatchView)
+    if (private_gameGoing(self))
     {
         MatchView_hide(self->currentMatchView);
         MainMenuView_displayContinueButton(self->currentMainMenuView);

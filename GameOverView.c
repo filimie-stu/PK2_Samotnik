@@ -9,6 +9,7 @@ typedef struct game_over_view
 } GameOverView;
 
 void GameController_restartGame(GameController* controllerAPI);
+void GameController_endMatch(GameController* controllerAPI);
 void GameController_mainMenu(GameController* controllerAPI);
 
 GameOverView* GameOverView_new(GameController* controllerAPI, GtkWindow* parent)
@@ -31,11 +32,10 @@ void GameOverView_display(GameOverView* self)
     switch (dialogResponse)
     {
     case 0:
-        GameOverView_hide(self);
         GameController_restartGame(self->controllerAPI);
         break;
     case 1:
-        GameOverView_hide(self);
+        GameController_endMatch(self->controllerAPI);
         GameController_mainMenu(self->controllerAPI);
         break;
     default:
