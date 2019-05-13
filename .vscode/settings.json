@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "*.xml": "html",
-        "board.h": "c"
+        "board.h": "c",
+        "gameoverview.h": "c"
     }
 }

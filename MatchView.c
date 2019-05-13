@@ -18,6 +18,7 @@ void GameController_clickBoard(GameController *self, Vector2D coords);
 typedef struct match_view
 {
     GtkWidget *window;
+    
     GtkWidget *mainMenuButton;
     GtkWidget *resetButton;
 
@@ -58,11 +59,11 @@ void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
         SyncScoreArgs args = *(SyncScoreArgs*)signalArgs;
         ScoreView_syncScore(self->scoreView, args);
     }
-    // else if (strncmp(signalID, "dead_end", strlen(signalID)) == 0)
-    // {
-        // MatchView *self = (MatchView *)vSelf;
-        // GameOverView_display(self->gameOverDialog);
-    // }
+    else if (strncmp(signalID, "dead_end", strlen(signalID)) == 0)
+    {
+        MatchView *self = (MatchView *)vSelf;
+        GameOverView_display(self->gameOverDialog);
+    }
 }
 
 MatchView *MatchView_new(GameController *controllerAPI, Board *board, Score* score)
@@ -94,7 +95,7 @@ MatchView *MatchView_new(GameController *controllerAPI, Board *board, Score* sco
     GtkContainer *scoreAnchorPoint = GTK_CONTAINER(gtk_builder_get_object(builder, "scoreAnchorPoint"));
     created->scoreView = ScoreView_new(controllerAPI, score, scoreAnchorPoint);
 
-
+    created->gameOverDialog = GameOverView_new(controllerAPI, GTK_WINDOW(created->window));
 
     return created;
 }

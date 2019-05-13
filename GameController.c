@@ -2,7 +2,6 @@
 #include "MainMenuView.h"
 #include "Observer.h"
 #include "MatchView.h"
-#include "GameOverView.h"
 #include "Board.h"
 #include "Score.h"
 #include <stdlib.h>
@@ -13,11 +12,9 @@ typedef struct game_controller
 {
     Board* board;
     Score* score;
-
     Observer* observingBoard;
     MatchView* currentMatchView;
     MainMenuView* currentMainMenuView;
-    GameOverView* gameOverView;
 } GameController;
 
 GameController* GameController_new()
@@ -26,7 +23,6 @@ GameController* GameController_new()
     created->observingBoard = NULL;
     created->currentMainMenuView = NULL;
     created->currentMatchView = NULL;
-    created->gameOverView = NULL;
     created->board = NULL;
     created->score = NULL;
     return created;
@@ -83,25 +79,19 @@ void GameController_prepareForExit(GameController* self)
 {
     //...
 }
-static void private_gameOver(GameController* self);
-void private_gameOver(GameController* self)
-{
-    printf("Game over\n");
-}
+
 static void private_recieveSignal(void* vSelf, const char* signalID, void* signalArgs);
 
 void private_recieveSignal(void* vSelf, const char* signalID, void* signalArgs)
 {
-    if (strncmp(signalID, "dead_end", strlen(signalID)) == 0)
+    if (strncmp(signalID, "jump", strlen(signalID)) == 0)
     {
-        private_gameOver((GameController*)vSelf);        
+        Score_increment(((GameController*)vSelf)->score);
     }
 }
 
 void GameController_restartGame(GameController* self)
 {
-    printf("restarting\n");
-    
     Board_destroy(self->board);
     Observer_dispose(self->observingBoard);
     self->board = Board_newFromFile("data/board.txt");
@@ -146,10 +136,6 @@ void GameController_beginMatch(GameController* self)
 
 void GameController_clickBoard(GameController* self, Vector2D coords)
 {
-    ClickResult clickResult = Board_clickField(self->board, coords);
-    if (clickResult == JUMP)
-    {
-        Score_increment(self->score);
-    }
-    
+    Board_clickField(self->board, coords);
+
 }
