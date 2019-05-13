@@ -160,6 +160,7 @@ int private_canActivate(Board* self, Vector2D clickedCoords)
     if (private_fieldAt(self, clickedCoords)->contents == REGULAR_TOKEN)
         return 1;
     return 0;
+
 }
 
 Field* private_getNeighbourOf(Board* self, Field* field, Direction dir)
@@ -266,11 +267,10 @@ void private_jump(Board *self, Vector2D dstCoords)
 
     private_takedownAt(self, attackedCoords);
     private_transferToken(self, dstCoords);
-
-    if (private_isDeadEndState(self))
-    {
-        Observable_notifyObservers(self->observable, "dead_end", &eventArgs);
-    }
+    // if (private_isDeadEndState(self))
+    // {
+        Observable_notifyObservers(self->observable, "dead_end", NULL);
+    // }
 }
 
 void private_takedownAt(Board* self, Vector2D at)

@@ -1,26 +1,32 @@
 #include "GameController.h"
 #include "MainMenuView.h"
+#include "Observer.h"
 #include "MatchView.h"
+#include "GameOverView.h"
 #include "Board.h"
 #include "Score.h"
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <string.h>
 
 typedef struct game_controller
 {
     Board* board;
     Score* score;
 
+    Observer* observingBoard;
     MatchView* currentMatchView;
     MainMenuView* currentMainMenuView;
+    GameOverView* gameOverView;
 } GameController;
 
 GameController* GameController_new()
 {
     GameController* created = (GameController*)malloc(sizeof(GameController));
+    created->observingBoard = NULL;
     created->currentMainMenuView = NULL;
     created->currentMatchView = NULL;
+    created->gameOverView = NULL;
     created->board = NULL;
     created->score = NULL;
     return created;
@@ -77,13 +83,29 @@ void GameController_prepareForExit(GameController* self)
 {
     //...
 }
+static void private_gameOver(GameController* self);
+void private_gameOver(GameController* self)
+{
+    printf("Game over\n");
+}
+static void private_recieveSignal(void* vSelf, const char* signalID, void* signalArgs);
+
+void private_recieveSignal(void* vSelf, const char* signalID, void* signalArgs)
+{
+    if (strncmp(signalID, "dead_end", strlen(signalID)) == 0)
+    {
+        private_gameOver((GameController*)vSelf);        
+    }
+}
 
 void GameController_restartGame(GameController* self)
 {
     printf("restarting\n");
     
     Board_destroy(self->board);
+    Observer_dispose(self->observingBoard);
     self->board = Board_newFromFile("data/board.txt");
+    self->observingBoard = Observer_new(self, private_recieveSignal, self->board->observable);
 
     Score_destroy(self->score);
     self->score = Score_new();
@@ -112,9 +134,11 @@ void GameController_beginMatch(GameController* self)
     {
         Board_destroy(self->board);
         Score_destroy(self->score);
+        Observer_dispose(self->observingBoard);
     }
 
     self->board = Board_newFromFile("data/board.txt");
+    self->observingBoard = Observer_new(self, private_recieveSignal, self->board->observable);
     self->score = Score_new();
     self->currentMatchView = MatchView_new(self, self->board, self->score);
     MatchView_display(self->currentMatchView);
@@ -127,4 +151,5 @@ void GameController_clickBoard(GameController* self, Vector2D coords)
     {
         Score_increment(self->score);
     }
+    
 }
