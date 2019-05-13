@@ -1,6 +1,7 @@
 #include "MatchView.h"
 #include "GameOverView.h"
 #include "BoardView.h"
+#include "ScoreView.h"
 #include "Board.h"
 #include "ClickEvent.h"
 #include "Observer.h"
@@ -19,10 +20,10 @@ typedef struct match_view
     GtkWidget *window;
     GtkWidget *mainMenuButton;
     GtkWidget *resetButton;
-    GtkWidget *tokensLeftCounter;
-    GtkWidget *takedownsCounter;
-    GameOverView *gameOverDialog;
+
     BoardView* boardView;
+    ScoreView* scoreView;
+    GameOverView *gameOverDialog;
 
     GameController *controllerAPI;
     Observer *boardObserver;
@@ -32,17 +33,6 @@ typedef struct match_view
 
 static void private_mainMenu(GtkButton *button, gpointer data);
 static void private_restartGame(GtkButton *button, gpointer data);
-
-void private_syncScore(MatchView* self, SyncScoreArgs args)
-{
-    char takedownsStr[3] = { '\0','\0','\0' };
-    sprintf_s(takedownsStr, sizeof(takedownsStr), "%d", args.takedowns);
-    gtk_label_set_label(GTK_LABEL(self->takedownsCounter), takedownsStr);
-    
-    char leftStr[3] = { '\0','\0','\0' };
-    sprintf_s(leftStr, sizeof(leftStr), "%d", args.tokensLeft);
-    gtk_label_set_label(GTK_LABEL(self->tokensLeftCounter), leftStr);
-}
 
 void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
 {
@@ -66,7 +56,7 @@ void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
     {
         MatchView *self = (MatchView *)vSelf;
         SyncScoreArgs args = *(SyncScoreArgs*)signalArgs;
-        private_syncScore(self, args);
+        ScoreView_syncScore(self->scoreView, args);
     }
     // else if (strncmp(signalID, "dead_end", strlen(signalID)) == 0)
     // {
@@ -91,10 +81,8 @@ MatchView *MatchView_new(GameController *controllerAPI, Board *board, Score* sco
     }
 
     created->window = GTK_WIDGET(gtk_builder_get_object(builder, "inGameWindow"));
-    created->takedownsCounter = GTK_WIDGET(gtk_builder_get_object(builder, "takedownsCounter"));
-    created->tokensLeftCounter = GTK_WIDGET(gtk_builder_get_object(builder, "tokensLeftCounter"));
     created->mainMenuButton = GTK_WIDGET(gtk_builder_get_object(builder, "mainMenuBtn"));
-    created->gameOverDialog = GameOverView_new(controllerAPI, GTK_CONTAINER(created->window));
+
     g_signal_connect(created->mainMenuButton, "clicked", G_CALLBACK(private_mainMenu), controllerAPI);
 
     created->resetButton = GTK_WIDGET(gtk_builder_get_object(builder, "restartBtn"));
@@ -102,11 +90,11 @@ MatchView *MatchView_new(GameController *controllerAPI, Board *board, Score* sco
 
     GtkContainer *boardAnchorPoint = GTK_CONTAINER(gtk_builder_get_object(builder, "boardAnchorPoint"));
     created->boardView = BoardView_new(controllerAPI, board, boardAnchorPoint);
-    
-    SyncScoreArgs initialScore = { score->takedowns, score->goal - score->takedowns };
-    private_syncScore(created, initialScore);
 
-    
+    GtkContainer *scoreAnchorPoint = GTK_CONTAINER(gtk_builder_get_object(builder, "scoreAnchorPoint"));
+    created->scoreView = ScoreView_new(controllerAPI, score, scoreAnchorPoint);
+
+
 
     return created;
 }
