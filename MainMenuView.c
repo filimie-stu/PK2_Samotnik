@@ -57,7 +57,11 @@ MainMenuView* MainMenuView_new(GameController* controllerAPI)
     g_signal_connect(created->newGameBtn, "clicked", G_CALLBACK(private_beginMatch), controllerAPI);
     g_signal_connect(created->continueBtn, "clicked", G_CALLBACK(private_continueMatch), controllerAPI);
     g_signal_connect(created->howToPlayBtn, "clicked", G_CALLBACK(private_displayHowToPlay), created->howToPlayView);
-    
+
+    GFile* stylesheet = g_file_new_for_path("css/theme.css");
+    GtkCssProvider *cssProvider = gtk_css_provider_new();
+    gtk_css_provider_load_from_file(cssProvider, stylesheet, NULL);
+    gtk_style_context_add_provider_for_screen(gdk_screen_get_default(), GTK_STYLE_PROVIDER(cssProvider), GTK_STYLE_PROVIDER_PRIORITY_USER);
     return created;
 }
 void MainMenuView_destroy(MainMenuView* self)

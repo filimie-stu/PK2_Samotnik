@@ -30,6 +30,8 @@
                     <object class="GtkGrid">
                         <child>
                             <object class="GtkFrame">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
                                 <property name="margin-top">15</property>
                                 <property name="margin-bottom">15</property>
                                 <property name="margin-start">15</property>
@@ -49,6 +51,9 @@
                         </child>
                         <child>
                             <object class="GtkFrame">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+
                                 <property name="margin-top">15</property>
                                 <property name="margin-bottom">15</property>
                                 <property name="margin-start">15</property>
@@ -68,6 +73,9 @@
                         </child>
                         <child>
                             <object class="GtkFrame">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+
                                 <property name="margin-top">15</property>
                                 <property name="margin-bottom">15</property>
                                 <property name="margin-start">15</property>
@@ -87,6 +95,9 @@
                         </child>
                         <child>
                             <object class="GtkFrame">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+
                                 <property name="margin-top">15</property>
                                 <property name="margin-bottom">15</property>
                                 <property name="margin-start">15</property>
