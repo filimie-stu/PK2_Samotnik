@@ -132,20 +132,17 @@ void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
     {
         BoardView *self = (BoardView *)vSelf;
         ActivateTokenArgs *args = (ActivateTokenArgs *)signalArgs;
-
         private_setJumpSpots(self, args->jumpSpots);
         private_setActiveField(self, args->activeCoords);
     }
     else if (strncmp(signalID, "jump", strlen(signalID)) == 0)
     {
-
         BoardView *self = (BoardView *)vSelf;
         JumpInfo args = *(JumpInfo*)signalArgs;
         BoardView_updateAt(self, args.from, "_");
         BoardView_updateAt(self, args.through, "_");
         BoardView_updateAt(self, args.to, "o");
         private_resetActiveField(self);
-
     }
 }
 

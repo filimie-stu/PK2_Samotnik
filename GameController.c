@@ -123,10 +123,10 @@ static void private_recieveSignal(void* vSelf, const char* signalID, void* signa
 
 void private_recieveSignal(void* vSelf, const char* signalID, void* signalArgs)
 {
-    if (strncmp(signalID, "jump", strlen(signalID)) == 0)
-    {
-        Score_increment(((GameController*)vSelf)->score);
-    }
+    // if (strncmp(signalID, "jump", strlen(signalID)) == 0)
+    // {
+    //     Score_increment(((GameController*)vSelf)->score);
+    // }
 }
 
 void GameController_restartGame(GameController* self)
