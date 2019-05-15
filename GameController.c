@@ -173,8 +173,3 @@ void GameController_beginMatch(GameController* self)
     MatchView_display(self->currentMatchView);
 }
 
-void GameController_clickBoard(GameController* self, Vector2D coords)
-{
-    Board_clickField(self->board, coords);
-
-}

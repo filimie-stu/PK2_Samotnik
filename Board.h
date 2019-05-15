@@ -22,7 +22,5 @@ typedef struct board
 
 Board* Board_newFromFile(const char* relativePath);
 void Board_destroy(Board* self);
-
-ClickResult Board_clickField(Board* self, Vector2D coords);
 int Board_tryJump(Board* self, Vector2D from, Vector2D to);
 int Board_tryActivate(Board* self, Vector2D at);
