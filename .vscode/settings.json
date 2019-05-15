@@ -4,6 +4,7 @@
         "*.glade": "html",
         "board.h": "c",
         "gameoverview.h": "c",
-        "observable.h": "c"
+        "observable.h": "c",
+        "syncscoreargs.h": "c"
     }
 }

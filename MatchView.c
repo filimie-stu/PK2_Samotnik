@@ -3,10 +3,7 @@
 #include "BoardView.h"
 #include "ScoreView.h"
 #include "Board.h"
-#include "ClickEvent.h"
 #include "Observer.h"
-#include "JumpArgs.h"
-#include "ActivateArgs.h"
 #include "SyncScoreArgs.h"
 #include <stdlib.h>
 #include <string.h>
@@ -36,7 +33,6 @@ static void private_restartGame(GtkButton *button, gpointer data);
 
 void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
 {
-  
     if (strncmp(signalID, "sync_score", strlen(signalID)) == 0)
     {
         MatchView *self = (MatchView *)vSelf;
@@ -46,6 +42,15 @@ void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
     else if (strncmp(signalID, "dead_end", strlen(signalID)) == 0)
     {
         MatchView *self = (MatchView *)vSelf;
+        GameOverViewModel viewModel = { "You lose!", "There are no more possible moves" };
+        self->gameOverDialog = GameOverView_new(self->controllerAPI, GTK_WINDOW(self->window), viewModel);
+        GameOverView_display(self->gameOverDialog);
+    }
+    else if (strncmp(signalID, "goal_achieved", strlen(signalID)) == 0)
+    {
+        MatchView *self = (MatchView *)vSelf;
+        GameOverViewModel viewModel = { "You win!", "There's only one token left, congratulations!" };
+        self->gameOverDialog = GameOverView_new(self->controllerAPI, GTK_WINDOW(self->window), viewModel);
         GameOverView_display(self->gameOverDialog);
     }
 }
@@ -79,7 +84,6 @@ MatchView *MatchView_new(GameController *controllerAPI, Board *board, Score* sco
     GtkContainer *scoreAnchorPoint = GTK_CONTAINER(gtk_builder_get_object(builder, "scoreAnchorPoint"));
     created->scoreView = ScoreView_new(controllerAPI, score, scoreAnchorPoint);
 
-    created->gameOverDialog = GameOverView_new(controllerAPI, GTK_WINDOW(created->window));
 
     return created;
 }

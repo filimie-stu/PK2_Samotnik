@@ -1,5 +1,6 @@
 #include "Vector2D.h"
 #include "GameOverView.h"
+#include "GameOverViewModel.h"
 #include <stdlib.h>
 
 typedef struct game_over_view 
@@ -13,11 +14,18 @@ void GameController_restartGame(GameController* controllerAPI);
 void GameController_endMatch(GameController* controllerAPI);
 void GameController_mainMenu(GameController* controllerAPI);
 
-GameOverView* GameOverView_new(GameController* controllerAPI, GtkWindow* parent)
+GameOverView* GameOverView_new(GameController* controllerAPI, GtkWindow* parent, GameOverViewModel viewModel)
 {
     GameOverView* created = (GameOverView*)malloc(sizeof(GameOverView)) ;
     GtkBuilder *builder = gtk_builder_new_from_file("view/game_over_view.glade");
     created->dialog = GTK_WIDGET(gtk_builder_get_object(builder, "gameOverDialog"));
+
+    GtkWidget* primaryLabel = GTK_WIDGET(gtk_builder_get_object(builder, "primaryText"));
+    gtk_label_set_label(GTK_LABEL(primaryLabel), viewModel.primaryText);
+    
+    GtkWidget* detailedDescription = GTK_WIDGET(gtk_builder_get_object(builder, "detailedDescription"));
+    gtk_label_set_label(GTK_LABEL(detailedDescription), viewModel.detailedDescription);
+
     created->controllerAPI = controllerAPI;
     gtk_window_set_transient_for(GTK_WINDOW(created->dialog), parent);
     return created;

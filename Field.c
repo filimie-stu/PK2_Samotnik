@@ -23,8 +23,7 @@ FieldType FieldType_fromChar(char c)
     case '#':
         return FORBIDDEN;
     default:
-        printf("%c: ", c);
-        perror("Unrecognized field type character.\n");
+        printf("%c: Unrecognized field type character.\n", c);
         return FORBIDDEN;
     }
 }

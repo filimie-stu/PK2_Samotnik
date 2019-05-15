@@ -1,9 +1,7 @@
 #include "ActivateTokenArgs.h"
 #include "ViewClickData.h"
 #include "BoardView.h"
-#include "JumpArgs.h"
 #include "Vector2D.h"
-#include "ClickEvent.h"
 #include <stdlib.h>
 #include <gtk/gtk.h>
 

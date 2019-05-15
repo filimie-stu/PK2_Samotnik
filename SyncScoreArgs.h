@@ -1,6 +1,4 @@
-
 #pragma once
-
 
 typedef struct sync_score_args 
 {
