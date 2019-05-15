@@ -38,7 +38,12 @@ int Board_tryJump(Board* self, Vector2D from, Vector2D to)
 {
     Field* fromField = private_fieldAt(self, from); 
     Field* toField = private_fieldAt(self, to);
+    
     if (!fromField || !toField)
+    {
+        return 0;
+    }
+    if (fromField->contents != ACTIVE_TOKEN && fromField->contents != REGULAR_TOKEN)
     {
         return 0;
     }
@@ -129,6 +134,7 @@ int Board_tryActivate(Board* self, Vector2D at)
     private_getJumpableFields(self, activatedField, jumpSpots);
 
     ActivateTokenArgs activationArgs;
+    activationArgs.activeCoords = at;
     for (Direction dir = 0; dir < 4; dir++)
     {
         if (jumpSpots[dir])
@@ -299,11 +305,11 @@ void private_getJumpableFields(Board* self, Field* from, Field* out_fields[4])
             Field* jumpDestination = private_getNeighbourOf(self, attackedField, dir);
             if (jumpDestination != NULL && jumpDestination->contents == EMPTY)
             {
-                out_fields[(int)dir] = jumpDestination;
-                return;
+                out_fields[dir] = jumpDestination;
+                continue;
             }
         }
-        out_fields[(int)dir] = NULL;
+        out_fields[dir] = NULL;
     }
     
 }
