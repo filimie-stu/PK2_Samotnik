@@ -10,7 +10,7 @@
 
 void GameController_mainMenu(GameController *self);
 void GameController_restartGame(GameController *self);
-void GameController_clickBoard(GameController *self, Vector2D coords);
+void GameController_rollback(GameController* self);
 
 typedef struct match_view
 {
@@ -30,6 +30,8 @@ typedef struct match_view
 
 static void private_mainMenu(GtkButton *button, gpointer data);
 static void private_restartGame(GtkButton *button, gpointer data);
+static void private_rollbackJump(GtkButton *button, gpointer data);
+
 
 void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
 {
@@ -76,7 +78,7 @@ MatchView *MatchView_new(GameController *controllerAPI, Board *board, Score* sco
     g_signal_connect(created->mainMenuButton, "clicked", G_CALLBACK(private_mainMenu), controllerAPI);
 
     created->resetButton = GTK_WIDGET(gtk_builder_get_object(builder, "restartBtn"));
-    g_signal_connect(created->resetButton, "clicked", G_CALLBACK(private_restartGame), controllerAPI);
+    g_signal_connect(created->resetButton, "clicked", G_CALLBACK(private_rollbackJump), controllerAPI);
 
     GtkContainer *boardAnchorPoint = GTK_CONTAINER(gtk_builder_get_object(builder, "boardAnchorPoint"));
     created->boardView = BoardView_new(controllerAPI, board, boardAnchorPoint);
@@ -108,4 +110,8 @@ void private_mainMenu(GtkButton *button, gpointer data)
 void private_restartGame(GtkButton *button, gpointer data)
 {
     GameController_restartGame((GameController *)data);
+}
+void private_rollbackJump(GtkButton *button, gpointer data)
+{
+    GameController_rollback((GameController*)data);
 }

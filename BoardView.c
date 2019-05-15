@@ -185,6 +185,17 @@ void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
         private_resetJumpSpots(self);
         private_resetActiveField(self);
     }
+    else if (strncmp(signalID, "rollback", strlen(signalID)) == 0)
+    {
+        BoardView *self = (BoardView *)vSelf;
+        JumpInfo args = *(JumpInfo*)signalArgs;
+        private_updateAt(self, args.from, "o");
+        private_updateAt(self, args.through, "o");
+        private_updateAt(self, args.to, "_");
+        private_resetJumpSpots(self);
+        private_resetActiveField(self);
+
+    }
 }
 void private_boardClicked(GtkButton *button, gpointer data)
 {

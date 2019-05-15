@@ -10,3 +10,4 @@ typedef struct score
 Score* Score_new();
 void Score_destroy(Score* self);
 void Score_increment(Score* self);
+void Score_decrement(Score *self);

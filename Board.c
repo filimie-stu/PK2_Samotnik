@@ -18,6 +18,16 @@ static int private_isDeadEndState(Board *self);
 static int private_jumpsPossibleFrom(Board *self, Field *from);
 static void private_applyJump(Board *self, JumpInfo jump);
 
+void Board_rollbackJump(Board* self, JumpInfo jump)
+{
+    // validate it!
+    
+    private_fieldAt(self, jump.from)->contents = REGULAR_TOKEN;
+    private_fieldAt(self, jump.through)->contents = REGULAR_TOKEN;
+    private_fieldAt(self, jump.to)->contents = EMPTY;
+
+    Observable_notifyObservers(self->observable, "rollback", &jump);
+}
 Board *Board_newFromFile(const char *relativePath)
 {
     Board *created = (Board *)malloc(sizeof(Board));

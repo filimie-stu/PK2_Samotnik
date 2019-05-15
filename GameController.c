@@ -5,12 +5,14 @@
 #include "MatchView.h"
 #include "Board.h"
 #include "Score.h"
+#include "JumpHistory.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 typedef struct game_controller
 {
+    JumpHistory* jumpHistory;
     Board* board;
     Score* score;
     Observer* observingBoard;
@@ -39,6 +41,7 @@ GameController* GameController_new()
     created->currentMatchView = NULL;
     created->board = NULL;
     created->score = NULL;
+    created->jumpHistory = NULL;
 
     return created;
 }
@@ -167,9 +170,14 @@ void GameController_beginMatch(GameController* self)
     }
 
     self->board = Board_newFromFile("data/board.txt");
-    self->observingBoard = Observer_new(self, private_recieveSignal, self->board->observable);
     self->score = Score_new();
+    self->jumpHistory = JumpHistory_new(self->board->observable);
+    self->observingBoard = Observer_new(self, private_recieveSignal, self->board->observable);
     self->currentMatchView = MatchView_new(self, self->board, self->score);
     MatchView_display(self->currentMatchView);
 }
-
+void GameController_rollback(GameController* self)
+{
+    Board_rollbackJump(self->board, JumpHistory_extract(self->jumpHistory)); 
+    Score_decrement(self->score);
+}
