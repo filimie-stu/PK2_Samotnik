@@ -14,3 +14,8 @@ Vector2D Vector2D_calculateMidpoint(Vector2D first, Vector2D second)
     midPoint.y = (first.y + second.y)/2;
     return midPoint;
 }
+
+int Vector2D_equals(Vector2D a, Vector2D b)
+{
+    return a.x == b.x && a.y == b.y;
+}

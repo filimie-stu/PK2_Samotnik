@@ -1,3 +1,4 @@
+#include "ActivateTokenArgs.h"
 #include "JumpArgs.h"
 #include "ActivateArgs.h"
 #include "Board.h"
@@ -10,6 +11,8 @@
 #include <math.h>
 #include <assert.h>
 
+static Field* private_getNeighbourOf(Board* self, Field* field, Direction dir);
+static void private_getJumpableFields(Board* self, Field* from, Field* out_fields[4]);
 
 static int private_loadDimensions(Board *incompleteSelf, FILE *sourceFile);
 static int private_loadFields(Board *incompleteSelf, FILE *sourceFile);
@@ -20,6 +23,65 @@ static int private_canJump(Board* self, Vector2D clickedCoords);
 static void private_takedownAt(Board* self, Vector2D at);
 static void private_transferToken(Board* self, Vector2D dst);
 static void private_jump(Board *self, Vector2D dstCoords);
+
+
+void private_applyJump(Board* self, JumpInfo jump)
+{
+    private_fieldAt(self, jump.from)->contents = EMPTY;
+    private_fieldAt(self, jump.through)->contents = EMPTY;
+    private_fieldAt(self, jump.to)->contents = REGULAR_TOKEN;
+
+    Observable_notifyObservers(self->observable, "jump", &jump);
+}
+
+int Board_tryJump(Board* self, Vector2D from, Vector2D to)
+{
+    Field* fromField = private_fieldAt(self, from); 
+    Field* toField = private_fieldAt(self, to);
+    if (!fromField || !toField)
+    {
+        return 0;
+    }
+
+    Field* spots[4];
+    private_getJumpableFields(self, fromField, spots);
+
+    for (Direction dir = 0; dir < 4; dir++)
+    {
+        if (spots[dir] && spots[dir] == toField)
+        {
+            Field* attackedField = private_getNeighbourOf(self, fromField, dir);
+            assert(attackedField != NULL && "This should've been already null-checked by 'getJumpableFields'");
+
+            JumpInfo jump = {from, attackedField->coords, to};
+            private_applyJump(self, jump);
+            return 1;
+        }
+
+    }
+    return 0;
+
+}
+
+
+void private_getJumpSpotsFor(Board* self, Vector2D coords, Vector2D out_spots[4])
+{
+
+}
+
+// int private_jumpIsValid(Board* self, JumpInfo jump)
+// {
+//     Field* jumpableFields[4];
+//     private_getJumpableFields(self, jump.from, jumpableFields);
+//     Field* clickedField = private_fieldAt(self, clickedCoords);
+    
+//     for (int i = 0; i < 4; i++)
+//     {
+//         if (clickedField == jumpableFields[i])
+//             return 1;
+//     }
+// }
+
 
 Board* Board_newFromFile(const char* relativePath)
 {
@@ -57,6 +119,32 @@ void Board_destroy(Board* self)
     free(self);
 }
 
+int Board_tryActivate(Board* self, Vector2D at)
+{
+    Field* activatedField = private_fieldAt(self, at);
+    if (!activatedField)
+        return 0;
+    
+    Field* jumpSpots[4];
+    private_getJumpableFields(self, activatedField, jumpSpots);
+
+    ActivateTokenArgs activationArgs;
+    for (Direction dir = 0; dir < 4; dir++)
+    {
+        if (jumpSpots[dir])
+        {
+            activationArgs.jumpSpots[dir] = jumpSpots[dir]->coords;
+        }
+        else
+        {
+            activationArgs.jumpSpots[dir]= Vector2D_create(-1,-1);
+        }
+
+    }
+
+    Observable_notifyObservers(self->observable, "activate", &activationArgs);
+
+}
 void private_activateAt(Board* self, Vector2D at)
 {
     ActivateArgs args;
@@ -76,6 +164,18 @@ void private_activateAt(Board* self, Vector2D at)
     self->activeField->contents = ACTIVE_TOKEN;
 
     args.activated = self->activeField->coords;
+
+    Field* jumpableFields[4];
+    private_getJumpableFields(self, self->activeField, jumpableFields);
+    for (int i = 0; i < 4; i++)
+        if(jumpableFields[i])
+            args.jumpSpots[i] = jumpableFields[i]->coords;
+        else
+        {
+            args.jumpSpots[i] = Vector2D_create(-1,-1);
+        }
+        
+
     Observable_notifyObservers(self->observable, "activate_token", &args);
 }
 ClickResult Board_clickField(Board* self, Vector2D coords)

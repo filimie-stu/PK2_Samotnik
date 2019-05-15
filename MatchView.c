@@ -27,7 +27,6 @@ typedef struct match_view
     GameOverView *gameOverDialog;
 
     GameController *controllerAPI;
-    Observer *boardObserver;
     Observer *scoreObserver;
 
 } MatchView;
@@ -37,23 +36,8 @@ static void private_restartGame(GtkButton *button, gpointer data);
 
 void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
 {
-    if (strncmp(signalID, "activate_token", strlen(signalID)) == 0)
-    {
-        MatchView *self = (MatchView *)vSelf;
-        ActivateArgs args = *(ActivateArgs*)signalArgs;
-
-        BoardView_updateAt(self->boardView, args.previouslyActive, "o");
-        BoardView_updateAt(self->boardView, args.activated, "O");
-    }
-    else if (strncmp(signalID, "jump", strlen(signalID)) == 0)
-    {
-        MatchView *self = (MatchView *)vSelf;
-        JumpArgs args = *(JumpArgs*)signalArgs;
-        BoardView_updateAt(self->boardView, args.from, "_");
-        BoardView_updateAt(self->boardView, args.through, "_");
-        BoardView_updateAt(self->boardView, args.to, "o");
-    }
-    else if (strncmp(signalID, "sync_score", strlen(signalID)) == 0)
+  
+    if (strncmp(signalID, "sync_score", strlen(signalID)) == 0)
     {
         MatchView *self = (MatchView *)vSelf;
         SyncScoreArgs args = *(SyncScoreArgs*)signalArgs;
@@ -70,7 +54,7 @@ MatchView *MatchView_new(GameController *controllerAPI, Board *board, Score* sco
 {
     MatchView *created = (MatchView *)malloc(sizeof(MatchView));
     created->controllerAPI = controllerAPI;
-    created->boardObserver = Observer_new(created, private_recieveSignal, board->observable);
+    // created->boardObserver = Observer_new(created, private_recieveSignal, board->observable);
     created->scoreObserver = Observer_new(created, private_recieveSignal, score->observable);
     GtkBuilder *builder = gtk_builder_new();
 

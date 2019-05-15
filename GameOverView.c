@@ -1,4 +1,5 @@
-    #include "GameOverView.h"
+#include "Vector2D.h"
+#include "GameOverView.h"
 #include <stdlib.h>
 
 typedef struct game_over_view 

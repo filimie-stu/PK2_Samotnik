@@ -54,6 +54,30 @@ void GameController_continueMatch(GameController* self)
     MainMenuView_hide(self->currentMainMenuView);
     MatchView_display(self->currentMatchView);
 }
+void GameController_jump(GameController* self, Vector2D from, Vector2D to)
+{
+    if (Board_tryJump(self->board, from, to))
+    {
+        Score_increment(self->score);
+    }    
+    else
+    {
+        printf("Error: invalid jump data.\n");
+    }
+}
+
+void GameController_activate(GameController* self, Vector2D at)
+{
+    if (Board_tryActivate(self->board, at))
+    {
+
+    }
+    else 
+    {
+        printf("Error: invalid activation data.\n");
+    }
+}
+
 
 void GameController_destroy(GameController* self)
 {
