@@ -1,6 +1,5 @@
 #include "ActivateTokenArgs.h"
 #include "ViewClickData.h"
-#include "ActivateArgs.h"
 #include "BoardView.h"
 #include "JumpArgs.h"
 #include "Vector2D.h"
@@ -21,7 +20,6 @@ typedef struct board_view
 
 } BoardView;
 
-
 typedef enum view_field_type
 {
     VIEW_TOKEN,
@@ -31,11 +29,20 @@ typedef enum view_field_type
 
 } ViewFieldType;
 
+static void private_updateAt(BoardView *self, Vector2D at, const char *newLabel);
 static GtkWidget* private_fieldAt(BoardView* self, Vector2D at);
-static void private_attachNewGridField(BoardView *self, int x, int y, const gchar *label);
-static void private_boardClicked(GtkButton *button, gpointer data);
-static void private_configureBoardClickCallback(BoardView *self, int row, int column);
+static ViewFieldType private_determineFieldType(BoardView *self, Vector2D fieldCoords);
+static int private_isJumpSpot(BoardView* self, GtkWidget* field);
+static void private_setActiveField(BoardView* self, Vector2D newField);
+static void private_resetActiveField(BoardView* self);
+static void private_setJumpSpots(BoardView* self, Vector2D newSpots[4]);
+static void private_resetJumpSpots(BoardView* self);
+static void private_jumpSpotsLightsOn(BoardView* self);
+static void private_jumpSpotsLightsOff(BoardView* self);
 static void private_loadModel(BoardView *self, Board *model);
+static void private_attachNewGridField(BoardView *self, int x, int y, const gchar *label);
+static void private_configureBoardClickCallback(BoardView *self, int row, int column);
+static void private_boardClicked(GtkButton *button, gpointer data);
 static void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs);
 
 void GameController_clickBoard(GameController *self, Vector2D coords);
@@ -71,13 +78,43 @@ void BoardView_hide(BoardView *self)
 
     gtk_widget_hide(self->boardGrid);
 }
-void BoardView_updateAt(BoardView *self, Vector2D at, const char *newLabel)
+
+
+GtkWidget* private_fieldAt(BoardView* self, Vector2D at)
+{
+    return gtk_grid_get_child_at(GTK_GRID(self->boardGrid), at.y,at.x);
+}
+void private_updateAt(BoardView *self, Vector2D at, const char *newLabel)
 {
     GtkWidget *cell = gtk_grid_get_child_at(GTK_GRID(self->boardGrid), at.y, at.x);
     if (cell)
         gtk_button_set_label(GTK_BUTTON(cell), newLabel);
 }
-
+void private_setActiveField(BoardView* self, Vector2D newField)
+{
+    private_updateAt(self, self->activeField, "o");
+    self->activeField = newField;
+    private_updateAt(self, self->activeField, "O");
+}
+void private_resetActiveField(BoardView* self)
+{
+    self->activeField = Vector2D_create(-1,-1);
+}
+void private_setJumpSpots(BoardView* self, Vector2D newSpots[4])
+{
+    private_jumpSpotsLightsOff(self);
+    for (int i = 0; i < 4; i++)
+    {
+        self->jumpSpots[i] = newSpots[i];
+    }
+    private_jumpSpotsLightsOn(self);
+}
+void private_resetJumpSpots(BoardView* self)
+{
+    private_jumpSpotsLightsOff(self);
+    for (int i = 0; i < 4; i++)
+        self->jumpSpots[i] = Vector2D_create(-1,-1);
+}
 void private_jumpSpotsLightsOff(BoardView* self)
 {
     for (int i = 0; i < 4; i++)
@@ -89,7 +126,6 @@ void private_jumpSpotsLightsOff(BoardView* self)
                 gtk_widget_get_style_context(highlightedField), "jump-target");
         }
     }
-    
 }
 void private_jumpSpotsLightsOn(BoardView* self)
 {
@@ -103,73 +139,6 @@ void private_jumpSpotsLightsOn(BoardView* self)
     }
     
 }
-
-void private_resetActiveField(BoardView* self)
-{
-    self->activeField = Vector2D_create(-1,-1);
-}
-
-void private_setJumpSpots(BoardView* self, Vector2D newSpots[4])
-{
-    private_jumpSpotsLightsOff(self);
-    for (int i = 0; i < 4; i++)
-    {
-        self->jumpSpots[i] = newSpots[i];
-    }
-    private_jumpSpotsLightsOn(self);
-}
-void private_setActiveField(BoardView* self, Vector2D newField)
-{
-    BoardView_updateAt(self, self->activeField, "o");
-    self->activeField = newField;
-    BoardView_updateAt(self, self->activeField, "O");
-}
-void private_resetJumpSpots(BoardView* self)
-{
-    private_jumpSpotsLightsOff(self);
-    for (int i = 0; i < 4; i++)
-        self->jumpSpots[i] = Vector2D_create(-1,-1);
-}
-
-void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
-{
-    if (strncmp(signalID, "activate", strlen(signalID)) == 0)
-    {
-        BoardView *self = (BoardView *)vSelf;
-        ActivateTokenArgs *args = (ActivateTokenArgs *)signalArgs;
-        private_setJumpSpots(self, args->jumpSpots);
-        private_setActiveField(self, args->activeCoords);
-    }
-    else if (strncmp(signalID, "jump", strlen(signalID)) == 0)
-    {
-        BoardView *self = (BoardView *)vSelf;
-        JumpInfo args = *(JumpInfo*)signalArgs;
-        BoardView_updateAt(self, args.from, "_");
-        BoardView_updateAt(self, args.through, "_");
-        BoardView_updateAt(self, args.to, "o");
-        private_resetJumpSpots(self);
-        private_resetActiveField(self);
-    }
-}
-
-GtkWidget* private_fieldAt(BoardView* self, Vector2D at)
-{
-    return gtk_grid_get_child_at(GTK_GRID(self->boardGrid), at.y,at.x);
-}
-int private_isJumpSpot(BoardView* self, GtkWidget* field)
-{
-    if (!private_fieldAt(self, self->activeField))
-        return 0;
-
-    for (int i = 0; i < 4; i++)
-    {
-        if (field == private_fieldAt(self, self->jumpSpots[i]))
-            return 1;
-    }   
-
-    return 0;
-}
-
 ViewFieldType private_determineFieldType(BoardView *self, Vector2D fieldCoords)
 {
     GtkWidget *field = private_fieldAt(self, fieldCoords);
@@ -186,7 +155,39 @@ ViewFieldType private_determineFieldType(BoardView *self, Vector2D fieldCoords)
     else
         assert(0 && "We should never get in here.\n");
 }
+int private_isJumpSpot(BoardView* self, GtkWidget* field)
+{
+    if (!private_fieldAt(self, self->activeField))
+        return 0;
 
+    for (int i = 0; i < 4; i++)
+    {
+        if (field == private_fieldAt(self, self->jumpSpots[i]))
+            return 1;
+    }   
+
+    return 0;
+}
+void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
+{
+    if (strncmp(signalID, "activate", strlen(signalID)) == 0)
+    {
+        BoardView *self = (BoardView *)vSelf;
+        ActivateTokenArgs *args = (ActivateTokenArgs *)signalArgs;
+        private_setJumpSpots(self, args->jumpSpots);
+        private_setActiveField(self, args->activeCoords);
+    }
+    else if (strncmp(signalID, "jump", strlen(signalID)) == 0)
+    {
+        BoardView *self = (BoardView *)vSelf;
+        JumpInfo args = *(JumpInfo*)signalArgs;
+        private_updateAt(self, args.from, "_");
+        private_updateAt(self, args.through, "_");
+        private_updateAt(self, args.to, "o");
+        private_resetJumpSpots(self);
+        private_resetActiveField(self);
+    }
+}
 void private_boardClicked(GtkButton *button, gpointer data)
 {
     ViewClickData *clickData = (ViewClickData *)data;

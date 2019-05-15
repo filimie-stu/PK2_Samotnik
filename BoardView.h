@@ -8,4 +8,3 @@ BoardView* BoardView_new(GameController* controllerAPI, Board* board, GtkContain
 void BoardView_destroy(BoardView* self);
 void BoardView_display(BoardView* self);
 void BoardView_hide(BoardView* self);
-void BoardView_updateAt(BoardView* self, Vector2D at, const char* newLabel);
