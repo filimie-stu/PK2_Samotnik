@@ -24,6 +24,7 @@ static void private_takedownAt(Board* self, Vector2D at);
 static void private_transferToken(Board* self, Vector2D dst);
 static void private_jump(Board *self, Vector2D dstCoords);
 
+static int private_isDeadEndState(Board* self);
 
 void private_applyJump(Board* self, JumpInfo jump)
 {
@@ -32,13 +33,18 @@ void private_applyJump(Board* self, JumpInfo jump)
     private_fieldAt(self, jump.to)->contents = REGULAR_TOKEN;
 
     Observable_notifyObservers(self->observable, "jump", &jump);
+    
+    if (private_isDeadEndState(self))
+    {
+        Observable_notifyObservers(self->observable, "dead_end", NULL);
+    }
 }
 
 int Board_tryJump(Board* self, Vector2D from, Vector2D to)
 {
     Field* fromField = private_fieldAt(self, from); 
     Field* toField = private_fieldAt(self, to);
-    
+
     if (!fromField || !toField)
     {
         return 0;
@@ -147,9 +153,8 @@ int Board_tryActivate(Board* self, Vector2D at)
         }
 
     }
-
     Observable_notifyObservers(self->observable, "activate", &activationArgs);
-
+    return 1;
 }
 void private_activateAt(Board* self, Vector2D at)
 {
@@ -373,10 +378,7 @@ void private_jump(Board *self, Vector2D dstCoords)
 
     private_takedownAt(self, attackedCoords);
     private_transferToken(self, dstCoords);
-    // if (private_isDeadEndState(self))
-    // {
-        Observable_notifyObservers(self->observable, "dead_end", NULL);
-    // }
+    
 }
 
 void private_takedownAt(Board* self, Vector2D at)

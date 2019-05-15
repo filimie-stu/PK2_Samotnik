@@ -25,7 +25,7 @@ typedef struct match_view
     BoardView* boardView;
     ScoreView* scoreView;
     GameOverView *gameOverDialog;
-
+    Observer* boardObserver;
     GameController *controllerAPI;
     Observer *scoreObserver;
 
@@ -54,7 +54,7 @@ MatchView *MatchView_new(GameController *controllerAPI, Board *board, Score* sco
 {
     MatchView *created = (MatchView *)malloc(sizeof(MatchView));
     created->controllerAPI = controllerAPI;
-    // created->boardObserver = Observer_new(created, private_recieveSignal, board->observable);
+    created->boardObserver = Observer_new(created, private_recieveSignal, board->observable);
     created->scoreObserver = Observer_new(created, private_recieveSignal, score->observable);
     GtkBuilder *builder = gtk_builder_new();
 
