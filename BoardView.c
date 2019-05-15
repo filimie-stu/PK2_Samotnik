@@ -124,7 +124,12 @@ void private_setActiveField(BoardView* self, Vector2D newField)
     self->activeField = newField;
     BoardView_updateAt(self, self->activeField, "O");
 }
-
+void private_resetJumpSpots(BoardView* self)
+{
+    private_jumpSpotsLightsOff(self);
+    for (int i = 0; i < 4; i++)
+        self->jumpSpots[i] = Vector2D_create(-1,-1);
+}
 
 void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
 {
@@ -142,6 +147,7 @@ void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
         BoardView_updateAt(self, args.from, "_");
         BoardView_updateAt(self, args.through, "_");
         BoardView_updateAt(self, args.to, "o");
+        private_resetJumpSpots(self);
         private_resetActiveField(self);
     }
 }
