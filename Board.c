@@ -17,7 +17,33 @@ static Field *private_fieldAt(Board *self, Vector2D at);
 static int private_isDeadEndState(Board *self);
 static int private_jumpsPossibleFrom(Board *self, Field *from);
 static void private_applyJump(Board *self, JumpInfo jump);
+static int private_wrapper_tryJump(void* vSelf, Vector2D from, Vector2D to);
+static int private_wrapper_tryActivate(void* vSelf, Vector2D at);
+static void private_wrapper_rollbackJump(void* vSelf, JumpInfo jumpData);
+static void private_wrapper_destroy(void* vSelf);
 
+
+ int private_wrapper_tryJump(void* vSelf, Vector2D from, Vector2D to)
+{
+    return Board_tryJump((Board*)vSelf, from, to);
+}
+ int private_wrapper_tryActivate(void* vSelf, Vector2D at)
+{
+    return Board_tryActivate((Board*)vSelf, at);
+}
+ void private_wrapper_rollbackJump(void* vSelf, JumpInfo jumpData)
+{
+    return Board_rollbackJump((Board*)vSelf, jumpData);
+}
+void private_wrapper_destroy(void *vSelf)
+{
+    Board_destroy((Board*)vSelf);
+}
+
+IBoard* Board_asIBoard(Board* self)
+{
+    return self->iBoard ;
+}
 void Board_rollbackJump(Board* self, JumpInfo jump)
 {
     // validate it!
@@ -31,6 +57,12 @@ void Board_rollbackJump(Board* self, JumpInfo jump)
 Board *Board_newFromFile(const char *relativePath)
 {
     Board *created = (Board *)malloc(sizeof(Board));
+    created->iBoard = IBoard_new(
+        created,
+        private_wrapper_destroy,
+        private_wrapper_tryJump,
+        private_wrapper_tryActivate,
+        private_wrapper_rollbackJump);
     created->activeField = NULL;
     created->tokenCount = 0;
     created->observable = Observable_new(created);

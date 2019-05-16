@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <gtk/gtk.h>
 #include "GameController.h"
+#include "ModelFactory.h"
 
 void openDialog(GtkButton* b, gpointer data)
 {
@@ -10,7 +11,9 @@ void openDialog(GtkButton* b, gpointer data)
 int main (int argc, char* argv[])
 {
     gtk_init(&argc, &argv);
-    GameController* controller = GameController_new();
+    GameController* controller = GameController_new(
+        ModelFactory_new("data/board.txt")
+    );
     GameController_mainMenu(controller);
 
     // GtkBuilder* b = gtk_builder_new_from_file("view/game_over_view.glade");

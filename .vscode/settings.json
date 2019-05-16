@@ -5,6 +5,8 @@
         "board.h": "c",
         "gameoverview.h": "c",
         "observable.h": "c",
-        "syncscoreargs.h": "c"
+        "syncscoreargs.h": "c",
+        "imodelfactory.h": "c",
+        "stdio.h": "c"
     }
 }

@@ -1,14 +1,6 @@
 #pragma once
 #include "Vector2D.h"
-
-typedef enum fieldType
-{
-    REGULAR_TOKEN,
-    ACTIVE_TOKEN,
-    EMPTY,
-    FORBIDDEN
-
-} FieldType;
+#include "Common.h"
 
 typedef struct field
 {
@@ -18,5 +10,4 @@ typedef struct field
 } Field;
 
 Field Field_create(int x, int y, FieldType contents);
-FieldType FieldType_fromChar(char c);
-char FieldType_toChar(FieldType ft);
+
