@@ -17,42 +17,65 @@ static Field *private_fieldAt(Board *self, Vector2D at);
 static int private_isDeadEndState(Board *self);
 static int private_jumpsPossibleFrom(Board *self, Field *from);
 static void private_applyJump(Board *self, JumpInfo jump);
-static int private_wrapper_tryJump(void* vSelf, Vector2D from, Vector2D to);
-static int private_wrapper_tryActivate(void* vSelf, Vector2D at);
-static void private_wrapper_rollbackJump(void* vSelf, JumpInfo jumpData);
-static void private_wrapper_destroy(void* vSelf);
+static int private_wrapper_tryJump(void *vSelf, Vector2D from, Vector2D to);
+static int private_wrapper_tryActivate(void *vSelf, Vector2D at);
+static void private_wrapper_rollbackJump(void *vSelf, JumpInfo jumpData);
+static void private_wrapper_destroy(void *vSelf);
+static FieldType private_wrapper_getFieldAt(void *vSelf, Vector2D at);
+static Vector2D private_wrapper_getDimensions(void *vSelf);
 
+Observable* Board_asObservable(Board* self)
+{
+    return IBoard_asObservable(self->iBoard);
+}
 
- int private_wrapper_tryJump(void* vSelf, Vector2D from, Vector2D to)
+FieldType private_wrapper_getFieldAt(void *vSelf, Vector2D at)
 {
-    return Board_tryJump((Board*)vSelf, from, to);
+    return Board_getFieldAt((Board *)vSelf, at);
 }
- int private_wrapper_tryActivate(void* vSelf, Vector2D at)
+Vector2D private_wrapper_getDimensions(void *vSelf)
 {
-    return Board_tryActivate((Board*)vSelf, at);
+    return Board_getDimensions((Board *)vSelf);
 }
- void private_wrapper_rollbackJump(void* vSelf, JumpInfo jumpData)
+
+Vector2D Board_getDimensions(Board *self)
 {
-    return Board_rollbackJump((Board*)vSelf, jumpData);
+    return self->dimensions;
+}
+FieldType Board_getFieldAt(Board *self, Vector2D at)
+{
+    return private_fieldAt(self, at)->contents;
+}
+int private_wrapper_tryJump(void *vSelf, Vector2D from, Vector2D to)
+{
+    return Board_tryJump((Board *)vSelf, from, to);
+}
+int private_wrapper_tryActivate(void *vSelf, Vector2D at)
+{
+    return Board_tryActivate((Board *)vSelf, at);
+}
+void private_wrapper_rollbackJump(void *vSelf, JumpInfo jumpData)
+{
+    return Board_rollbackJump((Board *)vSelf, jumpData);
 }
 void private_wrapper_destroy(void *vSelf)
 {
-    Board_destroy((Board*)vSelf);
+    Board_destroy((Board *)vSelf);
 }
 
-IBoard* Board_asIBoard(Board* self)
+IBoard *Board_asIBoard(Board *self)
 {
-    return self->iBoard ;
+    return self->iBoard;
 }
-void Board_rollbackJump(Board* self, JumpInfo jump)
+void Board_rollbackJump(Board *self, JumpInfo jump)
 {
     // validate it!
-    
+
     private_fieldAt(self, jump.from)->contents = REGULAR_TOKEN;
     private_fieldAt(self, jump.through)->contents = REGULAR_TOKEN;
     private_fieldAt(self, jump.to)->contents = EMPTY;
 
-    Observable_notifyObservers(self->observable, "rollback", &jump);
+    Observable_notifyObservers(Board_asObservable(self), "rollback", &jump);
 }
 Board *Board_newFromFile(const char *relativePath)
 {
@@ -62,10 +85,12 @@ Board *Board_newFromFile(const char *relativePath)
         private_wrapper_destroy,
         private_wrapper_tryJump,
         private_wrapper_tryActivate,
-        private_wrapper_rollbackJump);
+        private_wrapper_rollbackJump,
+        private_wrapper_getFieldAt,
+        private_wrapper_getDimensions
+        );
     created->activeField = NULL;
     created->tokenCount = 0;
-    created->observable = Observable_new(created);
 
     FILE *file;
     if (fopen_s(&file, relativePath, "r") != 0)
@@ -153,11 +178,9 @@ int Board_tryActivate(Board *self, Vector2D at)
             activationArgs.jumpSpots[dir] = Vector2D_create(-1, -1);
         }
     }
-    Observable_notifyObservers(self->observable, "activate", &activationArgs);
+    Observable_notifyObservers(Board_asObservable(self), "activate", &activationArgs);
     return 1;
 }
-
-
 
 void private_applyJump(Board *self, JumpInfo jump)
 {
@@ -165,11 +188,11 @@ void private_applyJump(Board *self, JumpInfo jump)
     private_fieldAt(self, jump.through)->contents = EMPTY;
     private_fieldAt(self, jump.to)->contents = REGULAR_TOKEN;
 
-    Observable_notifyObservers(self->observable, "jump", &jump);
+    Observable_notifyObservers(Board_asObservable(self), "jump", &jump);
 
     if (private_isDeadEndState(self))
     {
-        Observable_notifyObservers(self->observable, "dead_end", NULL);
+        Observable_notifyObservers(Board_asObservable(self), "dead_end", NULL);
     }
 }
 int private_loadDimensions(Board *incompleteSelf, FILE *sourceFile)

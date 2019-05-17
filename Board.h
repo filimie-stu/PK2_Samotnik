@@ -14,7 +14,6 @@ typedef enum
 typedef struct board 
 {
     IBoard* iBoard;
-    Observable* observable;
     Vector2D dimensions;
     Field** fields;
     Field* activeField;
@@ -24,7 +23,10 @@ typedef struct board
 
 Board* Board_newFromFile(const char* relativePath);
 void Board_destroy(Board* self);
+IBoard* Board_asIBoard(Board* self);
+Observable* Board_asObservable(Board* self);
 int Board_tryJump(Board* self, Vector2D from, Vector2D to);
 int Board_tryActivate(Board* self, Vector2D at);
 void Board_rollbackJump(Board* self, JumpInfo jumpData);
-IBoard* Board_asIBoard(Board* self);
+Vector2D Board_getDimensions(Board* self);
+FieldType Board_getFieldAt(Board* self, Vector2D at);

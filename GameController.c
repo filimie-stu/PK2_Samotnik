@@ -6,6 +6,7 @@
 #include "Score.h"
 #include "JumpHistory.h"
 #include "IModelFactory.h"
+#include "BoardViewModel.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -23,6 +24,24 @@ typedef struct game_controller
 } GameController;
 
 static int private_gameGoing(GameController* self);
+
+BoardViewModel private_boardToViewModel(IBoard* board)
+{
+    BoardViewModel viewModel;
+    viewModel.boardObservable = IBoard_asObservable(board);
+    viewModel.dimensions = IBoard_getDimensions(board);
+    for (int i = 0; i < viewModel.dimensions.x; i++)
+    {
+        for (int j = 0; j < viewModel.dimensions.y; j++)
+        {
+            Vector2D coords = {i,j};
+            viewModel.fields[i][j] = IBoard_getFieldAt(board, coords);
+        }
+    }
+    return viewModel;    
+}
+
+
 
 void GameController_endMatch(GameController* self)
 {
@@ -146,7 +165,7 @@ void GameController_restartGame(GameController* self)
     self->score = Score_new();
 
     MatchView_destroy(self->currentMatchView);
-    self->currentMatchView = MatchView_new(self, self->board, self->score);    
+    self->currentMatchView = MatchView_new(self, private_boardToViewModel(self->board), self->score);    
     
     MatchView_display(self->currentMatchView);
 }
@@ -176,7 +195,7 @@ void GameController_beginMatch(GameController* self)
     self->score = Score_new();
     self->jumpHistory = JumpHistory_new(IBoard_asObservable(self->board));
     self->observingIBoard = Observer_new(self, private_recieveSignal, IBoard_asObservable(self->board));
-    self->currentMatchView = MatchView_new(self, self->board, self->score);
+    self->currentMatchView = MatchView_new(self, private_boardToViewModel(self->board), self->score);
     MatchView_display(self->currentMatchView);
 }
 void GameController_rollback(GameController* self)

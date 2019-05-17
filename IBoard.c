@@ -1,34 +1,49 @@
 #include "Observable.h"
 #include "IBoard.h"
+#include "Common.h"
 #include <stdlib.h>
 #include <stdio.h>
-
 typedef struct i_board
 {
     void *implObject;
-    void(*destroyOverride)(void* implObject);
+    void (*destroyOverride)(void *implObject);
     int (*tryJumpOverride)(void *implObject, Vector2D from, Vector2D to);
     int (*tryActivateOverride)(void *implObject, Vector2D at);
     void (*rollbackJumpOverride)(void *implObject, JumpInfo jumpData);
-    
+    FieldType (*getFieldAtOverride)(void *implObject, Vector2D at);
+    Vector2D (*getDimensionsOverride)(void *implObject);
 
-    Observable* observable;
+    Observable *observable;
 
 } IBoard;
-Observable* IBoard_asObservable(IBoard* self)
+
+FieldType IBoard_getFieldAt(IBoard *self, Vector2D at)
+{
+    return self->getFieldAtOverride(self->implObject, at);
+}
+Vector2D IBoard_getDimensions(IBoard *self)
+{
+    return self->getDimensionsOverride(self->implObject);
+}
+Observable *IBoard_asObservable(IBoard *self)
 {
     return self->observable;
 }
 IBoard *IBoard_new(
     void *implObject,
-    void(*destroyOverride)(void* implObject),
+    void (*destroyOverride)(void *implObject),
     int (*tryJumpOverride)(void *implObject, Vector2D from, Vector2D to),
     int (*tryActivateOverride)(void *implObject, Vector2D at),
-    void (*rollbackJumpOverride)(void *implObjet, JumpInfo jumpData)
-    
+    void (*rollbackJumpOverride)(void *implObjet, JumpInfo jumpData),
+    FieldType (*getFieldAtOverride)(void *implObject, Vector2D at),
+    Vector2D (*getDimensionsOverride)(void *implObject)
+
 )
 {
-    if (!implObject || !destroyOverride || !tryJumpOverride || !tryActivateOverride || !rollbackJumpOverride)
+    if (!implObject || !destroyOverride ||
+        !tryJumpOverride || !tryActivateOverride ||
+        !rollbackJumpOverride || !getFieldAtOverride ||
+        !getDimensionsOverride)
     {
         printf("Error: NULL passed as interface override.\n");
     }
@@ -39,6 +54,8 @@ IBoard *IBoard_new(
     created->tryJumpOverride = tryJumpOverride;
     created->tryActivateOverride = tryActivateOverride;
     created->rollbackJumpOverride = rollbackJumpOverride;
+    created->getDimensionsOverride = getDimensionsOverride;
+    created->getFieldAtOverride = getFieldAtOverride;
     created->observable = Observable_new(created);
 
     return created;

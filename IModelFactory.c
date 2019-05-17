@@ -23,6 +23,7 @@ IModelFactory* IModelFactory_new(
     }
 
     IModelFactory* created = (IModelFactory*)malloc(sizeof(IModelFactory));
+    created->implementationObject = implObject;
     created->createBoardOverride = createBoardOverride;
     created->createScoreOverride= createScoreOverride;
     created->createJumpHistoryOverride = createJumpHistoryOverride  ;

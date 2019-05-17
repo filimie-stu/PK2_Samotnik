@@ -2,7 +2,7 @@
 #include "GameOverView.h"
 #include "BoardView.h"
 #include "ScoreView.h"
-#include "Board.h"
+#include "BoardViewModel.h"
 #include "Observer.h"
 #include "SyncScoreArgs.h"
 #include <stdlib.h>
@@ -57,11 +57,11 @@ void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
     }
 }
 
-MatchView *MatchView_new(GameController *controllerAPI, Board *board, Score* score)
+MatchView *MatchView_new(GameController *controllerAPI, BoardViewModel board, Score* score)
 {
     MatchView *created = (MatchView *)malloc(sizeof(MatchView));
     created->controllerAPI = controllerAPI;
-    created->boardObserver = Observer_new(created, private_recieveSignal, board->observable);
+    created->boardObserver = Observer_new(created, private_recieveSignal, board.boardObservable);
     created->scoreObserver = Observer_new(created, private_recieveSignal, score->observable);
     GtkBuilder *builder = gtk_builder_new();
 

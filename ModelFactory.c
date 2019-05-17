@@ -29,6 +29,10 @@ static IJumpHistory* private_wrapper_createJumpHistory(void* vSelf)
     return ModelFactory_createJumpHistory((ModelFactory*)vSelf);
 }
 
+IModelFactory *ModelFactory_asIModelFactory(ModelFactory* self)
+{
+    return self->iModelFactory;
+}
 ModelFactory* ModelFactory_new(const char* settingsFileRelativePath)
 {
     ModelFactory* created = (ModelFactory*)malloc(sizeof(ModelFactory));
@@ -50,7 +54,7 @@ void ModelFactory_destroy(ModelFactory* self)
 }
 IBoard* ModelFactory_createBoard(ModelFactory* self)
 {
-    return Board_newFromFile(self->settingsFileRelativePath);
+    return Board_asIBoard(Board_newFromFile(self->settingsFileRelativePath));
 }
 IScore* ModelFactory_createScore(ModelFactory* self)
 {

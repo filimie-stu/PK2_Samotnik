@@ -2,6 +2,7 @@
 #include "ViewClickData.h"
 #include "BoardView.h"
 #include "Vector2D.h"
+#include "JumpInfo.h"
 #include <stdlib.h>
 #include <gtk/gtk.h>
 
@@ -37,7 +38,7 @@ static void private_setJumpSpots(BoardView* self, Vector2D newSpots[4]);
 static void private_resetJumpSpots(BoardView* self);
 static void private_jumpSpotsLightsOn(BoardView* self);
 static void private_jumpSpotsLightsOff(BoardView* self);
-static void private_loadModel(BoardView *self, Board *model);
+static void private_loadModel(BoardView *self, BoardViewModel model);
 static void private_attachNewGridField(BoardView *self, int x, int y, const gchar *label);
 static void private_configureBoardClickCallback(BoardView *self, int row, int column);
 static void private_boardClicked(GtkButton *button, gpointer data);
@@ -48,12 +49,12 @@ void GameController_jump(GameController* self, Vector2D from, Vector2D to);
 void GameController_activate(GameController* self, Vector2D at);
 
 
-BoardView *BoardView_new(GameController *controllerAPI, Board *board, GtkContainer *parent)
+BoardView *BoardView_new(GameController *controllerAPI, BoardViewModel board, GtkContainer *parent)
 {
     BoardView *created = (BoardView *)malloc(sizeof(BoardView));
     created->controllerAPI = controllerAPI;
     created->parent = parent;
-    created->observer = Observer_new(created, private_recieveSignal, board->observable);
+    created->observer = Observer_new(created, private_recieveSignal, board.boardObservable);
     private_loadModel(created, board);
 
     return created;
@@ -223,20 +224,20 @@ void private_boardClicked(GtkButton *button, gpointer data)
         break;
     }
 }
-void private_loadModel(BoardView *self, Board *model)
+void private_loadModel(BoardView *self, BoardViewModel model)
 {
     self->boardGrid = gtk_grid_new();
     gtk_container_add(self->parent, self->boardGrid);
 
-    for (int i = 0; i < model->dimensions.y; i++)
+    for (int i = 0; i < model.dimensions.y; i++)
     {
-        for (int j = 0; j < model->dimensions.x; j++)
+        for (int j = 0; j < model.dimensions.x; j++)
         {
-            if (FieldType_toChar(model->fields[i][j].contents) != 'o' &&
-                FieldType_toChar(model->fields[i][j].contents) != '_')
+            if (FieldType_toChar(model.fields[i][j]) != 'o' &&
+                FieldType_toChar(model.fields[i][j]) != '_')
                 continue;
 
-            gchar label[2] = {FieldType_toChar(model->fields[i][j].contents), '\0'};
+            gchar label[2] = {FieldType_toChar(model.fields[i][j]), '\0'};
             private_attachNewGridField(self, j, i, label);
             private_configureBoardClickCallback(self, i, j);
         }

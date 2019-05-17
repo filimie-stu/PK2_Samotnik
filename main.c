@@ -12,9 +12,11 @@ int main (int argc, char* argv[])
 {
     gtk_init(&argc, &argv);
     GameController* controller = GameController_new(
-        ModelFactory_new("data/board.txt")
+        ModelFactory_asIModelFactory(ModelFactory_new("data/board.txt"))
     );
     GameController_mainMenu(controller);
+
+
 
     // GtkBuilder* b = gtk_builder_new_from_file("view/game_over_view.glade");
     
