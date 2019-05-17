@@ -22,6 +22,7 @@ typedef struct game_controller
     Observer* observingIBoard;
     MatchView* currentMatchView;
     MainMenuView* currentMainMenuView;
+    NewGameArgs lastUsedSettings;
 
 } GameController;
 
@@ -169,10 +170,10 @@ void GameController_restartGame(GameController* self)
 {
     IBoard_destroy(self->board,1);
     Observer_dispose(self->observingIBoard);
-    self->board = IModelFactory_createBoard(self->modelFactory);
+    self->board = IModelFactory_createBoard(self->modelFactory, self->lastUsedSettings.boardFilename);
 
     IScore_destroy(self->score);
-    self->score = IModelFactory_createScore(self->modelFactory);
+    self->score = IModelFactory_createScore(self->modelFactory, IBoard_countTokens(self->board), self->lastUsedSettings.handicap);
 
     MatchView_destroy(self->currentMatchView);
     self->currentMatchView = MatchView_new(self, private_boardToViewModel(self->board), private_scoreToViewModel(self->score));    
@@ -190,6 +191,7 @@ int private_gameGoing(GameController* self)
 
 void GameController_beginMatch(GameController* self, NewGameArgs settings)
 {
+    self->lastUsedSettings = settings;
     if (self->currentMainMenuView)
     {
         MainMenuView_hide(self->currentMainMenuView);
@@ -200,9 +202,9 @@ void GameController_beginMatch(GameController* self, NewGameArgs settings)
         IScore_destroy(self->score);
         Observer_dispose(self->observingIBoard);
     }
-
-    self->board = IModelFactory_createBoard(self->modelFactory);
-    self->score = IModelFactory_createScore(self->modelFactory);
+    printf("%s\n", settings.boardFilename);
+    self->board = IModelFactory_createBoard(self->modelFactory, settings.boardFilename);
+    self->score = IModelFactory_createScore(self->modelFactory, IBoard_countTokens(self->board), settings.handicap);
     self->jumpHistory = IModelFactory_createJumpHistory(self->modelFactory);
     self->observingIBoard = Observer_new(self, private_recieveSignal, IBoard_asObservable(self->board));
     self->currentMatchView = MatchView_new(self, private_boardToViewModel(self->board), private_scoreToViewModel(self->score));

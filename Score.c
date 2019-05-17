@@ -26,7 +26,7 @@ int private_wrapper_getGoal(void* vSelf)
     return Score_getGoal((Score*)vSelf);
 }
 
-Score *Score_new()
+Score *Score_new(int goal, int handicap)
 
 {
     Score *created = (Score *)malloc(sizeof(Score));
@@ -37,8 +37,9 @@ Score *Score_new()
         private_wrapper_increment,
         private_wrapper_decrement
     );
-    created->goal = 10;
+    created->goal = goal;
     created->takedowns = 0;
+    created->handicap = handicap;
     return created;
 }
 void Score_destroy(Score *self)
@@ -57,7 +58,7 @@ int Score_getGoal(Score* self)
 
 int private_goalAchieved(Score *self)
 {
-    return self->takedowns >= self->goal;
+    return self->takedowns + self->handicap >= self->goal;
 }
 
 IScore* Score_asIScore(Score* self)

@@ -5,9 +5,10 @@ typedef struct score
     IScore* iScore;
     int takedowns;
     int goal;
+    int handicap;
 } Score;
 
-Score* Score_new();
+Score* Score_new(int goal, int handicap);
 IScore* Score_asIScore(Score* self);
 Observable* Score_asObservable(Score* self);
 void Score_destroy(Score* self);

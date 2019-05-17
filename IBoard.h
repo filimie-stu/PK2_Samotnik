@@ -13,12 +13,16 @@ IBoard* IBoard_new(
     int(*tryActivateOverride)(void* implObject, Vector2D at),
     void(*rollbackJumpOverride)(void* implObjet, JumpInfo jumpData),
     FieldType (*getFieldAtOverride)(void *implObject, Vector2D at),
-    Vector2D (*getDimensionsOverride)(void* implObject)
+    Vector2D (*getDimensionsOverride)(void* implObject),
+    int(*countTokensOverride)(void* implObject)
 );
-void IBoard_destroy(IBoard* self, int destroyDerivedTypes);
+
 int IBoard_tryJump(IBoard* self, Vector2D from, Vector2D to, JumpInfo* out_jumpData );
 int IBoard_tryActivate(IBoard* self, Vector2D at);
 void IBoard_rollbackJump(IBoard* self, JumpInfo jumpData);
-Observable* IBoard_asObservable(IBoard* self);
 FieldType IBoard_getFieldAt(IBoard* self, Vector2D at);
 Vector2D IBoard_getDimensions(IBoard* self);
+int IBoard_countTokens(IBoard* self);
+
+Observable* IBoard_asObservable(IBoard* self);
+void IBoard_destroy(IBoard* self, int destroyDerivedTypes);

@@ -12,6 +12,7 @@ typedef struct i_board
     void (*rollbackJumpOverride)(void *implObject, JumpInfo jumpData);
     FieldType (*getFieldAtOverride)(void *implObject, Vector2D at);
     Vector2D (*getDimensionsOverride)(void *implObject);
+    int(*countTokensOverride)(void* implObject);
 
     Observable *observable;
 
@@ -36,14 +37,15 @@ IBoard *IBoard_new(
     int (*tryActivateOverride)(void *implObject, Vector2D at),
     void (*rollbackJumpOverride)(void *implObjet, JumpInfo jumpData),
     FieldType (*getFieldAtOverride)(void *implObject, Vector2D at),
-    Vector2D (*getDimensionsOverride)(void *implObject)
+    Vector2D (*getDimensionsOverride)(void *implObject),
+    int(*countTokensOverride)(void* implObject)
 
 )
 {
     if (!implObject || !destroyOverride ||
         !tryJumpOverride || !tryActivateOverride ||
         !rollbackJumpOverride || !getFieldAtOverride ||
-        !getDimensionsOverride)
+        !getDimensionsOverride || !countTokensOverride)
     {
         printf("Error: NULL passed as interface override.\n");
     }
@@ -56,6 +58,8 @@ IBoard *IBoard_new(
     created->rollbackJumpOverride = rollbackJumpOverride;
     created->getDimensionsOverride = getDimensionsOverride;
     created->getFieldAtOverride = getFieldAtOverride;
+    created->countTokensOverride=countTokensOverride;
+
     created->observable = Observable_new(created);
 
     return created;
@@ -82,4 +86,8 @@ int IBoard_tryActivate(IBoard *self, Vector2D at)
 void IBoard_rollbackJump(IBoard *self, JumpInfo jumpData)
 {
     self->rollbackJumpOverride(self->implObject, jumpData);
+}
+int IBoard_countTokens(IBoard* self)
+{
+    return self->countTokensOverride(self->implObject);
 }

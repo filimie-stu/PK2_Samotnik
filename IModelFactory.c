@@ -5,16 +5,16 @@
 typedef struct i_model_factory 
 {
     void* implementationObject;
-    IBoard* (*createBoardOverride)(void* implObject);
-    IScore* (*createScoreOverride)(void* implObject);
+    IBoard* (*createBoardOverride)(void* implObject, const char* relativeFilename);
+    IScore* (*createScoreOverride)(void* implObject, int goal, int handicap);
     IJumpHistory* (*createJumpHistoryOverride)(void* implObject);
 } IModelFactory;
 
 
 IModelFactory* IModelFactory_new(
     void* implObject,
-    IBoard* (*createBoardOverride)(void* implObject),
-    IScore* (*createScoreOverride)(void* implObject),
+    IBoard* (*createBoardOverride)(void* implObject, const char* relativeFilename),
+    IScore* (*createScoreOverride)(void* implObject, int goal, int handicap),
     IJumpHistory* (*createJumpHistoryOverride)(void* implObject))
 {
     if (!implObject || !createBoardOverride || !createScoreOverride || !createJumpHistoryOverride)
@@ -35,15 +35,15 @@ void IModelFactory_destroy(IModelFactory* self)
 {
     // todo
 }
-IBoard* IModelFactory_createBoard(IModelFactory* self)
+IBoard* IModelFactory_createBoard(IModelFactory* self, const char* relativeFilename)
 {
-    self->createBoardOverride(self->implementationObject);
+    return self->createBoardOverride(self->implementationObject, relativeFilename);
 }
-IScore* IModelFactory_createScore(IModelFactory* self)
+IScore* IModelFactory_createScore(IModelFactory* self, int goal, int handicap)
 {
-    self->createScoreOverride(self->implementationObject);
+    return self->createScoreOverride(self->implementationObject, goal, handicap);
 }
 IJumpHistory* IModelFactory_createJumpHistory(IModelFactory* self)
 {
-    self->createJumpHistoryOverride(self->implementationObject);
+    return self->createJumpHistoryOverride(self->implementationObject);
 }

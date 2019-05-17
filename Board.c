@@ -23,12 +23,33 @@ static void private_wrapper_rollbackJump(void *vSelf, JumpInfo jumpData);
 static void private_wrapper_destroy(void *vSelf);
 static FieldType private_wrapper_getFieldAt(void *vSelf, Vector2D at);
 static Vector2D private_wrapper_getDimensions(void *vSelf);
+static int private_wrapper_countTokens(void* vSelf);
+
+int private_wrapper_countTokens(void* vSelf)
+{
+    return Board_countTokens((Board*)vSelf);
+}
 
 Observable* Board_asObservable(Board* self)
 {
     return IBoard_asObservable(self->iBoard);
 }
-
+int Board_countTokens(Board* self)
+{
+    int count = 0;
+    for (int i = 0; i < self->dimensions.x; i++)
+    {
+        for (int j = 0; j < self->dimensions.y; j++)
+        {
+            Vector2D at = { i, j };
+            if (Board_getFieldAt(self, at) == REGULAR_TOKEN || Board_getFieldAt(self, at) == ACTIVE_TOKEN)
+            {
+                count++;
+            }
+        }
+    }
+    return count;    
+}
 FieldType private_wrapper_getFieldAt(void *vSelf, Vector2D at)
 {
     return Board_getFieldAt((Board *)vSelf, at);
@@ -87,7 +108,8 @@ Board *Board_newFromFile(const char *relativePath)
         private_wrapper_tryActivate,
         private_wrapper_rollbackJump,
         private_wrapper_getFieldAt,
-        private_wrapper_getDimensions
+        private_wrapper_getDimensions,
+        private_wrapper_countTokens
         );
     created->activeField = NULL;
     created->tokenCount = 0;
