@@ -1,3 +1,4 @@
+#include "NewGameArgs.h"
 #include "ScoreViewModel.h"
 #include "GameController.h"
 #include "MainMenuView.h"
@@ -187,7 +188,7 @@ int private_gameGoing(GameController* self)
     return 0;
 }
 
-void GameController_beginMatch(GameController* self)
+void GameController_beginMatch(GameController* self, NewGameArgs settings)
 {
     if (self->currentMainMenuView)
     {

@@ -1,11 +1,13 @@
+#include "NewGameArgs.h"
 #include "MainMenuView.h"
 #include "HowToPlayView.h"
+#include "StartupSettingsDialog.h"
 #include <stdlib.h>
-
+#include <assert.h>
 
 void GameController_prepareForExit(GameController* self);
 void GameController_mainMenu(GameController* self);
-void GameController_beginMatch(GameController* self);
+void GameController_beginMatch(GameController* self, NewGameArgs args);
 void GameController_continueMatch(GameController* self);
 
 typedef struct main_menu_view 
@@ -15,16 +17,41 @@ typedef struct main_menu_view
     GtkWidget* newGameBtn;
     GtkWidget* howToPlayBtn;
     GtkWidget* exitBtn;
-    
+    StartupSettingsDialog* startupSettings;
     GameController* controllerAPI;
     HowToPlayView* howToPlayView;
 
 } MainMenuView;
 
+
+
+
 static void private_beginMatch(GtkButton* button, gpointer data);
 static void private_exitProgram(GtkButton* button, gpointer data);
 static void private_continueMatch(GtkButton* button, gpointer data);
+static void private_newGame(MainMenuView* self,GtkButton* button);
 
+void private_newGame(MainMenuView* self, GtkButton* button)
+{
+    gint dialogResponse = gtk_dialog_run(GTK_DIALOG(StartupSettingsDialog_getDialog(self->startupSettings)));
+
+    if (dialogResponse == GTK_RESPONSE_ACCEPT)
+    {
+        NewGameArgs args = { 
+            StartupSettingsDialog_getFilename(self->startupSettings),
+            StartupSettingsDialog_getHandicap(self->startupSettings)
+             };
+        GameController_beginMatch(self->controllerAPI, args); 
+    }
+    else if (dialogResponse == GTK_RESPONSE_CANCEL)
+    {
+        // just close the dialog
+    }  
+    else
+    {
+        assert(0 && "We should've gotten here!\n");
+    }
+}
 void private_continueMatch(GtkButton* button, gpointer data)
 {
     GameController_continueMatch((GameController*)data);
@@ -37,6 +64,7 @@ void private_displayHowToPlay(GtkButton* button, gpointer data)
 MainMenuView* MainMenuView_new(GameController* controllerAPI)
 {
     MainMenuView* created = (MainMenuView*)malloc(sizeof(MainMenuView));
+    created->startupSettings = StartupSettingsDialog_newFromFile("view/startup_settings_view.glade");
     created->controllerAPI = controllerAPI;
 
     GtkBuilder* builder = gtk_builder_new();
@@ -54,7 +82,12 @@ MainMenuView* MainMenuView_new(GameController* controllerAPI)
 
     created->howToPlayView = HowToPlayView_new(controllerAPI, GTK_WINDOW(created->window));
     g_signal_connect(created->exitBtn, "clicked", G_CALLBACK(private_exitProgram), controllerAPI);
-    g_signal_connect(created->newGameBtn, "clicked", G_CALLBACK(private_beginMatch), controllerAPI);
+    // NewGameArgs* newGameArgs = NewGameArgs_new(
+    //     controllerAPI,
+    //     StartupSettingsDialog_getFilename(created->startupSettings),
+    //     StartupSettingsDialog_getHandicap(created->startupSettings)
+    // );
+    g_signal_connect_swapped(created->newGameBtn, "clicked", G_CALLBACK(private_newGame), created);
     g_signal_connect(created->continueBtn, "clicked", G_CALLBACK(private_continueMatch), controllerAPI);
     g_signal_connect(created->howToPlayBtn, "clicked", G_CALLBACK(private_displayHowToPlay), created->howToPlayView);
 
@@ -88,7 +121,7 @@ void MainMenuView_hide(MainMenuView* self)
 
 void private_beginMatch(GtkButton* button, gpointer data)
 {
-    GameController_beginMatch((GameController*)data);
+    // GameController_beginMatch((GameController*)data);
 }
 
 void private_exitProgram(GtkButton* button, gpointer data)
