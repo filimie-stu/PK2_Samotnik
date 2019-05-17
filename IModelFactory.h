@@ -1,8 +1,7 @@
 #pragma once
 #include "IBoard.h"
-typedef struct i_score IScore;
-typedef struct i_jump_history IJumpHistory;
-
+#include "IScore.h"
+#include "IJumpHistory.h"
 
 typedef struct i_model_factory IModelFactory;
 

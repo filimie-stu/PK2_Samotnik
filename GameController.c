@@ -5,7 +5,7 @@
 #include "Observer.h"
 #include "MatchView.h"
 #include "IScore.h"
-#include "JumpHistory.h"
+#include "IJumpHistory.h"
 #include "IModelFactory.h"
 #include "BoardViewModel.h"
 #include <stdlib.h>
@@ -14,10 +14,10 @@
 
 typedef struct game_controller
 {
-    JumpHistory* jumpHistory;
     IModelFactory* modelFactory;
     IBoard* board;
     IScore* score;
+    IJumpHistory* jumpHistory;
     Observer* observingIBoard;
     MatchView* currentMatchView;
     MainMenuView* currentMainMenuView;
@@ -93,7 +93,7 @@ void GameController_jump(GameController* self, Vector2D from, Vector2D to)
     if (IBoard_tryJump(self->board, from, to, &jumpData))
     {
         IScore_increment(self->score);
-        JumpHistory_addRecord(self->jumpHistory, jumpData);
+        IJumpHistory_addRecord(self->jumpHistory, jumpData);
     }    
     else
     {
@@ -169,7 +169,6 @@ void GameController_restartGame(GameController* self)
     IBoard_destroy(self->board,1);
     Observer_dispose(self->observingIBoard);
     self->board = IModelFactory_createBoard(self->modelFactory);
-    self->observingIBoard = Observer_new(self, private_recieveSignal, IBoard_asObservable(self->board));
 
     IScore_destroy(self->score);
     self->score = IModelFactory_createScore(self->modelFactory);
@@ -203,13 +202,13 @@ void GameController_beginMatch(GameController* self)
 
     self->board = IModelFactory_createBoard(self->modelFactory);
     self->score = IModelFactory_createScore(self->modelFactory);
-    self->jumpHistory = JumpHistory_new(IBoard_asObservable(self->board));
+    self->jumpHistory = IModelFactory_createJumpHistory(self->modelFactory);
     self->observingIBoard = Observer_new(self, private_recieveSignal, IBoard_asObservable(self->board));
     self->currentMatchView = MatchView_new(self, private_boardToViewModel(self->board), private_scoreToViewModel(self->score));
     MatchView_display(self->currentMatchView);
 }
 void GameController_rollback(GameController* self)
 {
-    IBoard_rollbackJump(self->board, JumpHistory_extract(self->jumpHistory)); 
+    IBoard_rollbackJump(self->board, IJumpHistory_extract(self->jumpHistory)); 
     IScore_decrement(self->score);
 }

@@ -7,30 +7,56 @@
 #define MAX_RECORDS 30
 typedef struct jump_history
 {
+    IJumpHistory *iJumpHistory;
     JumpInfo recordedJumps[MAX_RECORDS];
     int recordedCount;
 } JumpHistory;
 
-static void private_recieveSignal(void* vSelf, const char* signalID, void* signalArgs);
+static void private_wrapper_destroy(void *vSelf);
+static void private_wrapper_addRecord(void *vSelf, JumpInfo jumpData);
+static JumpInfo private_wrapper_extract(void *vSelf);
 
-JumpHistory* JumpHistory_new(Observable* boardObservable)
+void private_wrapper_destroy(void *vSelf)
 {
-    JumpHistory* created = (JumpHistory*)malloc(sizeof(JumpHistory));
+    //todo
+}
+void private_wrapper_addRecord(void *vSelf, JumpInfo jumpData)
+{
+    JumpHistory_addRecord((JumpHistory *)vSelf, jumpData);
+}
+JumpInfo private_wrapper_extract(void *vSelf)
+{
+    return JumpHistory_extract((JumpHistory *)vSelf);
+}
+
+JumpHistory *JumpHistory_new()
+{
+    JumpHistory *created = (JumpHistory *)malloc(sizeof(JumpHistory));
     created->recordedCount = 0;
+    created->iJumpHistory = IJumpHistory_new(
+        created,
+        private_wrapper_destroy,
+        private_wrapper_addRecord,
+        private_wrapper_extract
+    );
     return created;
 }
-void JumpHistory_destroy(JumpHistory* self)
+void JumpHistory_destroy(JumpHistory *self)
 {
     free(self);
 }
-void JumpHistory_addRecord(JumpHistory* self, JumpInfo jump)
+IJumpHistory *JumpHistory_asIJumpHistory(JumpHistory *self)
+{
+    return self->iJumpHistory;
+}
+void JumpHistory_addRecord(JumpHistory *self, JumpInfo jump)
 {
     assert(self->recordedCount < MAX_RECORDS);
 
     self->recordedJumps[self->recordedCount] = jump;
     self->recordedCount++;
 }
-JumpInfo JumpHistory_extract(JumpHistory* self)
+JumpInfo JumpHistory_extract(JumpHistory *self)
 {
     if (self->recordedCount <= 0)
         printf("Error: there are no recorded jumps to extract.\n");

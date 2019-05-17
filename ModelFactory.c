@@ -64,6 +64,5 @@ IScore* ModelFactory_createScore(ModelFactory* self)
 
 IJumpHistory* ModelFactory_createJumpHistory(ModelFactory* self)
 {
-    //todo
-    return NULL;
+    return JumpHistory_asIJumpHistory(JumpHistory_new());
 }
