@@ -1,6 +1,7 @@
 #include "ModelFactory.h"
 #include "IModelFactory.h"
 #include "Board.h"
+#include "Score.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -58,9 +59,9 @@ IBoard* ModelFactory_createBoard(ModelFactory* self)
 }
 IScore* ModelFactory_createScore(ModelFactory* self)
 {
-    //todo
-    return NULL;
+    return Score_asIScore(Score_new());    
 }
+
 IJumpHistory* ModelFactory_createJumpHistory(ModelFactory* self)
 {
     //todo

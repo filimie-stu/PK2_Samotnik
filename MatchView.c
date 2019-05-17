@@ -35,13 +35,13 @@ static void private_rollbackJump(GtkButton *button, gpointer data);
 
 void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
 {
-    if (strncmp(signalID, "sync_score", strlen(signalID)) == 0)
-    {
-        MatchView *self = (MatchView *)vSelf;
-        SyncScoreArgs args = *(SyncScoreArgs*)signalArgs;
-        ScoreView_syncScore(self->scoreView, args);
-    }
-    else if (strncmp(signalID, "dead_end", strlen(signalID)) == 0)
+    // if (strncmp(signalID, "sync_score", strlen(signalID)) == 0)
+    // {
+    //     MatchView *self = (MatchView *)vSelf;
+    //     SyncScoreArgs args = *(SyncScoreArgs*)signalArgs;
+    //     ScoreView_syncScore(self->scoreView, args);
+    // }
+     if (strncmp(signalID, "dead_end", strlen(signalID)) == 0)
     {
         MatchView *self = (MatchView *)vSelf;
         GameOverViewModel viewModel = { "You lose!", "There are no more possible moves" };
@@ -57,12 +57,12 @@ void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
     }
 }
 
-MatchView *MatchView_new(GameController *controllerAPI, BoardViewModel board, Score* score)
+MatchView *MatchView_new(GameController *controllerAPI, BoardViewModel board, ScoreViewModel score)
 {
     MatchView *created = (MatchView *)malloc(sizeof(MatchView));
     created->controllerAPI = controllerAPI;
     created->boardObserver = Observer_new(created, private_recieveSignal, board.boardObservable);
-    created->scoreObserver = Observer_new(created, private_recieveSignal, score->observable);
+    created->scoreObserver = Observer_new(created, private_recieveSignal, score.scoreObservable);
     GtkBuilder *builder = gtk_builder_new();
 
     GError *error = NULL;

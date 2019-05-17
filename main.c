@@ -11,9 +11,8 @@ void openDialog(GtkButton* b, gpointer data)
 int main (int argc, char* argv[])
 {
     gtk_init(&argc, &argv);
-    GameController* controller = GameController_new(
-        ModelFactory_asIModelFactory(ModelFactory_new("data/board.txt"))
-    );
+    ModelFactory* modelFactory = ModelFactory_new("data/board.txt");
+    GameController* controller = GameController_new( ModelFactory_asIModelFactory(modelFactory) );
     GameController_mainMenu(controller);
 
 
