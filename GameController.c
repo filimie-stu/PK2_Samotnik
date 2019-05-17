@@ -89,9 +89,11 @@ void GameController_continueMatch(GameController* self)
 }
 void GameController_jump(GameController* self, Vector2D from, Vector2D to)
 {
-    if (IBoard_tryJump(self->board, from, to))
+    JumpInfo jumpData;
+    if (IBoard_tryJump(self->board, from, to, &jumpData))
     {
         IScore_increment(self->score);
+        JumpHistory_addRecord(self->jumpHistory, jumpData);
     }    
     else
     {

@@ -7,7 +7,7 @@ typedef struct i_board
 {
     void *implObject;
     void (*destroyOverride)(void *implObject);
-    int (*tryJumpOverride)(void *implObject, Vector2D from, Vector2D to);
+    int (*tryJumpOverride)(void *implObject, Vector2D from, Vector2D to, JumpInfo* out_jumpData);
     int (*tryActivateOverride)(void *implObject, Vector2D at);
     void (*rollbackJumpOverride)(void *implObject, JumpInfo jumpData);
     FieldType (*getFieldAtOverride)(void *implObject, Vector2D at);
@@ -32,7 +32,7 @@ Observable *IBoard_asObservable(IBoard *self)
 IBoard *IBoard_new(
     void *implObject,
     void (*destroyOverride)(void *implObject),
-    int (*tryJumpOverride)(void *implObject, Vector2D from, Vector2D to),
+    int (*tryJumpOverride)(void *implObject, Vector2D from, Vector2D to, JumpInfo* out_jumpData),
     int (*tryActivateOverride)(void *implObject, Vector2D at),
     void (*rollbackJumpOverride)(void *implObjet, JumpInfo jumpData),
     FieldType (*getFieldAtOverride)(void *implObject, Vector2D at),
@@ -71,9 +71,9 @@ void IBoard_destroy(IBoard *self, int destroyDerivedTypes)
         free(self);
     }
 }
-int IBoard_tryJump(IBoard *self, Vector2D from, Vector2D to)
+int IBoard_tryJump(IBoard *self, Vector2D from, Vector2D to, JumpInfo* jumpData)
 {
-    return self->tryJumpOverride(self->implObject, from, to);
+    return self->tryJumpOverride(self->implObject, from, to, jumpData);
 }
 int IBoard_tryActivate(IBoard *self, Vector2D at)
 {

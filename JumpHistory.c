@@ -7,35 +7,23 @@
 #define MAX_RECORDS 30
 typedef struct jump_history
 {
-    Observer* observer;
-
     JumpInfo recordedJumps[MAX_RECORDS];
     int recordedCount;
 } JumpHistory;
 
 static void private_recieveSignal(void* vSelf, const char* signalID, void* signalArgs);
-static void private_add(JumpHistory* self, JumpInfo jump);
-
-void private_recieveSignal(void* vSelf, const char* signalID, void* signalArgs)
-{
-    if (strncmp(signalID, "jump", strlen(signalID))==0)
-    {
-        private_add((JumpHistory*)vSelf, *(JumpInfo*)signalArgs);
-    }
-}
 
 JumpHistory* JumpHistory_new(Observable* boardObservable)
 {
     JumpHistory* created = (JumpHistory*)malloc(sizeof(JumpHistory));
     created->recordedCount = 0;
-    created->observer = Observer_new(created, private_recieveSignal, boardObservable);
     return created;
 }
 void JumpHistory_destroy(JumpHistory* self)
 {
     free(self);
 }
-void private_add(JumpHistory* self, JumpInfo jump)
+void JumpHistory_addRecord(JumpHistory* self, JumpInfo jump)
 {
     assert(self->recordedCount < MAX_RECORDS);
 

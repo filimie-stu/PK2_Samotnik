@@ -17,7 +17,7 @@ static Field *private_fieldAt(Board *self, Vector2D at);
 static int private_isDeadEndState(Board *self);
 static int private_jumpsPossibleFrom(Board *self, Field *from);
 static void private_applyJump(Board *self, JumpInfo jump);
-static int private_wrapper_tryJump(void *vSelf, Vector2D from, Vector2D to);
+static int private_wrapper_tryJump(void *vSelf, Vector2D from, Vector2D to, JumpInfo* out_jumpData);
 static int private_wrapper_tryActivate(void *vSelf, Vector2D at);
 static void private_wrapper_rollbackJump(void *vSelf, JumpInfo jumpData);
 static void private_wrapper_destroy(void *vSelf);
@@ -46,9 +46,9 @@ FieldType Board_getFieldAt(Board *self, Vector2D at)
 {
     return private_fieldAt(self, at)->contents;
 }
-int private_wrapper_tryJump(void *vSelf, Vector2D from, Vector2D to)
+int private_wrapper_tryJump(void *vSelf, Vector2D from, Vector2D to, JumpInfo* out_jumpData)
 {
-    return Board_tryJump((Board *)vSelf, from, to);
+    return Board_tryJump((Board *)vSelf, from, to, out_jumpData);
 }
 int private_wrapper_tryActivate(void *vSelf, Vector2D at)
 {
@@ -121,7 +121,7 @@ void Board_destroy(Board *self)
     free(self);
 }
 
-int Board_tryJump(Board *self, Vector2D from, Vector2D to)
+int Board_tryJump(Board *self, Vector2D from, Vector2D to, JumpInfo* out_jumpData)
 {
     Field *fromField = private_fieldAt(self, from);
     Field *toField = private_fieldAt(self, to);
@@ -146,6 +146,7 @@ int Board_tryJump(Board *self, Vector2D from, Vector2D to)
             assert(attackedField != NULL && "This should've been already null-checked by 'getJumpableFields'");
 
             JumpInfo jump = {from, attackedField->coords, to};
+            *out_jumpData = jump; 
             private_applyJump(self, jump);
             return 1;
         }
