@@ -1,8 +1,21 @@
 button {
-    border-radius: 0;
+    border-radius: 2.5px;
+    border-width: .5px;
+    margin: 4px;
 }
 
 button.jump-target {
-    background:goldenrod;
-    opacity: 0.5; 
+    background: rgba(255, 255, 0, 0.534);
+}
+
+
+
+button.jump-target:hover{
+    background:rgba(81, 255, 0, 0.226) 
+}
+
+
+button.active-field{
+    border: 1.75px solid rgba(255, 182, 23, 0.39); 
+    
 }
