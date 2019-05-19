@@ -8,6 +8,7 @@
         "syncscoreargs.h": "c",
         "imodelfactory.h": "c",
         "stdio.h": "c",
-        "jumphistory.h": "c"
+        "jumphistory.h": "c",
+        "howtoplaydialog.h": "c"
     }
 }

@@ -10,7 +10,7 @@ typedef struct board_view
 {
     Observer *observer;
 
-    GameController *controllerAPI;
+    IGameController *controllerAPI;
     GtkContainer *parent;
     GtkWidget *boardGrid;
 
@@ -46,11 +46,8 @@ static void private_configureBoardClickCallback(BoardView *self, int row, int co
 static void private_boardClicked(GtkButton *button, gpointer data);
 static void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs);
 
-void GameController_clickBoard(GameController *self, Vector2D coords);
-void GameController_jump(GameController *self, Vector2D from, Vector2D to);
-void GameController_activate(GameController *self, Vector2D at);
 
-BoardView *BoardView_new(GameController *controllerAPI, BoardViewModel board, GtkContainer *parent)
+BoardView *BoardView_new(IGameController *controllerAPI, BoardViewModel board, GtkContainer *parent)
 {
     BoardView *created = (BoardView *)malloc(sizeof(BoardView));
     created->controllerAPI = controllerAPI;
@@ -235,11 +232,11 @@ void private_boardClicked(GtkButton *button, gpointer data)
     switch (type)
     {
     case VIEW_JUMP_SPOT:
-        GameController_jump(self->controllerAPI, self->activeField, clickCoords);
+        IGameController_jump(self->controllerAPI, self->activeField, clickCoords);
         break;
 
     case VIEW_TOKEN:
-        GameController_activate(self->controllerAPI, clickCoords);
+        IGameController_activate(self->controllerAPI, clickCoords);
         break;
 
     case VIEW_EMPTY:

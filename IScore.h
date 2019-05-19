@@ -12,7 +12,7 @@ IScore *IScore_new(
     void (*incrementOverride)(void* implObject),
     void (*decrementOverride)(void* implObject));
 Observable *IScore_asObservable(IScore *self);
-void IScore_destroy(IScore *self);
+void IScore_destroy(IScore *self, int destroyDerivedTypes);
 void IScore_increment(IScore* self);
 void IScore_decrement(IScore* self);
 int IScore_getPoints(IScore *self);

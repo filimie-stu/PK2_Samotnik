@@ -8,84 +8,94 @@
 #include <stdlib.h>
 #include <string.h>
 
-void GameController_mainMenu(GameController *self);
-void GameController_restartGame(GameController *self);
-void GameController_rollback(GameController* self);
 
 typedef struct match_view
 {
+    IView *iView;
+    IGameController *controllerAPI;
+    Observer *observingBoard;
+    Observer *observingScore;
+
     GtkWidget *window;
-    
     GtkWidget *mainMenuButton;
     GtkWidget *resetButton;
+    GtkWidget *rollbackButton;
 
-    BoardView* boardView;
-    ScoreView* scoreView;
+    GtkContainer *boardAnchorPoint;
+    BoardView *boardView;
+
+    GtkContainer *scoreAnchorPoint;
+    ScoreView *scoreView;
+
     GameOverView *gameOverDialog;
-    Observer* boardObserver;
-    GameController *controllerAPI;
-    Observer *scoreObserver;
 
 } MatchView;
 
 static void private_mainMenu(GtkButton *button, gpointer data);
 static void private_restartGame(GtkButton *button, gpointer data);
 static void private_rollbackJump(GtkButton *button, gpointer data);
+static void private_wrapper_destroy(void *vSelf);
+static void private_wrapper_display(void *vSelf);
+static void private_wrapper_hide(void *vSelf);
 
-
+IView *MatchView_asIView(MatchView *self)
+{
+    return self->iView;
+}
 void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
 {
-    // if (strncmp(signalID, "sync_score", strlen(signalID)) == 0)
-    // {
-    //     MatchView *self = (MatchView *)vSelf;
-    //     SyncScoreArgs args = *(SyncScoreArgs*)signalArgs;
-    //     ScoreView_syncScore(self->scoreView, args);
-    // }
-     if (strncmp(signalID, "dead_end", strlen(signalID)) == 0)
+    if (strncmp(signalID, "dead_end", strlen(signalID)) == 0)
     {
         MatchView *self = (MatchView *)vSelf;
-        GameOverViewModel viewModel = { "You lose!", "There are no more possible moves" };
+        GameOverViewModel viewModel = {"You lose!", "There are no more possible moves"};
         self->gameOverDialog = GameOverView_new(self->controllerAPI, GTK_WINDOW(self->window), viewModel);
         GameOverView_display(self->gameOverDialog);
     }
     else if (strncmp(signalID, "goal_achieved", strlen(signalID)) == 0)
     {
         MatchView *self = (MatchView *)vSelf;
-        GameOverViewModel viewModel = { "You win!", "There's only one token left, congratulations!" };
+        GameOverViewModel viewModel = {"You win!", "There's only one token left, congratulations!"};
         self->gameOverDialog = GameOverView_new(self->controllerAPI, GTK_WINDOW(self->window), viewModel);
         GameOverView_display(self->gameOverDialog);
     }
 }
+void private_loadMembersFromXML(MatchView* self)
+{
+    GtkBuilder *builder = gtk_builder_new_from_file("view/in_game_view.glade");
+    self->window = GTK_WIDGET(gtk_builder_get_object(builder, "matchWindow"));
+    self->mainMenuButton = GTK_WIDGET(gtk_builder_get_object(builder, "mainMenuBtn"));
+    self->resetButton = GTK_WIDGET(gtk_builder_get_object(builder, "restartBtn"));
+    self->rollbackButton = GTK_WIDGET(gtk_builder_get_object(builder, "rollbackBtn"));
+    self->boardAnchorPoint = GTK_CONTAINER(gtk_builder_get_object(builder, "boardAnchorPoint"));
+    self->scoreAnchorPoint = GTK_CONTAINER(gtk_builder_get_object(builder, "scoreAnchorPoint"));
 
-MatchView *MatchView_new(GameController *controllerAPI, BoardViewModel board, ScoreViewModel score)
+}
+void private_configureCallbacks(MatchView* self)
+{
+    g_signal_connect(self->mainMenuButton, "clicked", G_CALLBACK(private_mainMenu), self->controllerAPI);
+    g_signal_connect(self->resetButton, "clicked", G_CALLBACK(private_restartGame), self->controllerAPI);
+    g_signal_connect(self->rollbackButton, "clicked", G_CALLBACK(private_rollbackJump), self->controllerAPI);
+}
+
+MatchView *MatchView_new(IGameController* controllerAPI, MatchViewModel viewModel)
 {
     MatchView *created = (MatchView *)malloc(sizeof(MatchView));
+    created->iView = IView_new(
+        created,
+        private_wrapper_destroy,
+        private_wrapper_display,
+        private_wrapper_hide);
+    
     created->controllerAPI = controllerAPI;
-    created->boardObserver = Observer_new(created, private_recieveSignal, board.boardObservable);
-    created->scoreObserver = Observer_new(created, private_recieveSignal, score.scoreObservable);
-    GtkBuilder *builder = gtk_builder_new();
+    created->observingBoard = Observer_new(created, private_recieveSignal, viewModel.boardVM.boardObservable);
+    created->observingScore = Observer_new(created, private_recieveSignal, viewModel.scoreVM.scoreObservable);
+    
+    private_loadMembersFromXML(created);
 
-    GError *error = NULL;
-    if (gtk_builder_add_from_file(builder, "view/in_game_view.glade", &error) == 0)
-    {
-        g_printerr("Error during loading file: %s\n", error->message);
-        g_clear_error(&error);
-    }
-
-    created->window = GTK_WIDGET(gtk_builder_get_object(builder, "inGameWindow"));
-    created->mainMenuButton = GTK_WIDGET(gtk_builder_get_object(builder, "mainMenuBtn"));
-
-    g_signal_connect(created->mainMenuButton, "clicked", G_CALLBACK(private_mainMenu), controllerAPI);
-
-    created->resetButton = GTK_WIDGET(gtk_builder_get_object(builder, "restartBtn"));
-    g_signal_connect(created->resetButton, "clicked", G_CALLBACK(private_rollbackJump), controllerAPI);
-
-    GtkContainer *boardAnchorPoint = GTK_CONTAINER(gtk_builder_get_object(builder, "boardAnchorPoint"));
-    created->boardView = BoardView_new(controllerAPI, board, boardAnchorPoint);
-
-    GtkContainer *scoreAnchorPoint = GTK_CONTAINER(gtk_builder_get_object(builder, "scoreAnchorPoint"));
-    created->scoreView = ScoreView_new(controllerAPI, score, scoreAnchorPoint);
-
+    created->boardView = BoardView_new(created->controllerAPI, viewModel.boardVM, created->boardAnchorPoint);
+    created->scoreView = ScoreView_new(created->controllerAPI, viewModel.scoreVM, created->scoreAnchorPoint);
+    
+    private_configureCallbacks(created);
 
     return created;
 }
@@ -105,13 +115,25 @@ void MatchView_hide(MatchView *self)
 
 void private_mainMenu(GtkButton *button, gpointer data)
 {
-    GameController_mainMenu((GameController *)data);
+    IGameController_mainMenu((IGameController *)data);
 }
 void private_restartGame(GtkButton *button, gpointer data)
 {
-    GameController_restartGame((GameController *)data);
+    IGameController_restartGame((IGameController *)data);
 }
 void private_rollbackJump(GtkButton *button, gpointer data)
 {
-    GameController_rollback((GameController*)data);
+    IGameController_rollback((IGameController *)data);
+}
+void private_wrapper_destroy(void *vSelf)
+{
+    MatchView_destroy((MatchView *)vSelf);
+}
+void private_wrapper_display(void *vSelf)
+{
+    MatchView_display((MatchView *)vSelf);
+}
+void private_wrapper_hide(void *vSelf)
+{
+    MatchView_hide((MatchView *)vSelf);
 }

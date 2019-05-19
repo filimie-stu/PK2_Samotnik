@@ -8,7 +8,6 @@
 typedef struct model_factory
 {
     IModelFactory *iModelFactory;
-    const char *settingsFileRelativePath;
 } ModelFactory;
 
 static IBoard *private_wrapper_createBoard(void *vSelf, const char *relativeFilename);
@@ -32,19 +31,14 @@ IModelFactory *ModelFactory_asIModelFactory(ModelFactory *self)
 {
     return self->iModelFactory;
 }
-ModelFactory *ModelFactory_new(const char *settingsFileRelativePath)
+ModelFactory *ModelFactory_new()
 {
     ModelFactory *created = (ModelFactory *)malloc(sizeof(ModelFactory));
-    if (!settingsFileRelativePath)
-    {
-        printf("Error: empty string passed as file path.\n");
-    }
     created->iModelFactory = IModelFactory_new(
         created,
         private_wrapper_createBoard,
         private_wrapper_createScore,
         private_wrapper_createJumpHistory);
-    created->settingsFileRelativePath = settingsFileRelativePath;
     return created;
 }
 void ModelFactory_destroy(ModelFactory *self)
@@ -53,7 +47,7 @@ void ModelFactory_destroy(ModelFactory *self)
 }
 IBoard *ModelFactory_createBoard(ModelFactory *self, const char *relativeFilename)
 {
-    return Board_asIBoard(Board_newFromFile(self->settingsFileRelativePath));
+    return Board_asIBoard(Board_newFromFile(relativeFilename));
 }
 IScore *ModelFactory_createScore(ModelFactory *self, int goal, int handicap)
 {

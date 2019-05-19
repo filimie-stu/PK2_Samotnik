@@ -40,7 +40,7 @@ Observable *IScore_asObservable(IScore *self)
     return self->observable;
 }
 
-void IScore_destroy(IScore *self)
+void IScore_destroy(IScore *self, int destroyDerivedTypes)
 {
 }
 

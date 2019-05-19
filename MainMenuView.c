@@ -1,131 +1,152 @@
+#include "IView.h"
 #include "NewGameArgs.h"
+#include "MainMenuViewModel.h"
 #include "MainMenuView.h"
-#include "HowToPlayView.h"
+#include "HowToPlayDialog.h"
 #include "StartupSettingsDialog.h"
 #include <stdlib.h>
 #include <assert.h>
 
-void GameController_prepareForExit(GameController* self);
-void GameController_mainMenu(GameController* self);
-void GameController_beginMatch(GameController* self, NewGameArgs args);
-void GameController_continueMatch(GameController* self);
-
-typedef struct main_menu_view 
+typedef struct main_menu_view
 {
-    GtkWidget* window;
-    GtkWidget* continueBtn;
-    GtkWidget* newGameBtn;
-    GtkWidget* howToPlayBtn;
-    GtkWidget* exitBtn;
-    StartupSettingsDialog* startupSettings;
-    GameController* controllerAPI;
-    HowToPlayView* howToPlayView;
-
+    IView *iView;
+    GtkWidget *window;
+    GtkWidget *continueBtn;
+    int displayContinueBtn;
+    GtkWidget *newGameBtn;
+    GtkWidget *howToPlayBtn;
+    GtkWidget *exitBtn;
+    StartupSettingsDialog *startupSettings;
+    HowToPlayDialog *howToPlayDialog;
+    IGameController *controllerAPI;
 } MainMenuView;
 
+static void private_exitProgram(IGameController *controller);
+static void private_continueMatch(IGameController *controller);
+static void private_newGame(MainMenuView *self, GtkButton *button);
+static void private_howToPlay(MainMenuView *self);
+static void private_loadMembersFromXML(MainMenuView *self, const char *relativeFilename);
+static void private_configureCallbacks(MainMenuView *self);
+static void private_loadCssFromFile(const char *relativeFilename);
 
+static void private_wrapper_destroy(void *vSelf);
+static void private_wrapper_display(void *vSelf);
+static void private_wrapper_hide(void *vSelf);
 
+MainMenuView *MainMenuView_new(IGameController *controllerAPI, MainMenuViewModel viewModel)
+{
+    MainMenuView *created = (MainMenuView *)malloc(sizeof(MainMenuView));
+    created->iView = IView_new(
+        created,
+        private_wrapper_destroy,
+        private_wrapper_display,
+        private_wrapper_hide);
+    created->controllerAPI = controllerAPI;
 
-static void private_beginMatch(GtkButton* button, gpointer data);
-static void private_exitProgram(GtkButton* button, gpointer data);
-static void private_continueMatch(GtkButton* button, gpointer data);
-static void private_newGame(MainMenuView* self,GtkButton* button);
+    private_loadMembersFromXML(created, "view/main_menu_view.glade");
+    created->howToPlayDialog = HowToPlayDialog_newFromFile("view/how_to_play_view.glade", GTK_WINDOW(created->window));
+    created->startupSettings = StartupSettingsDialog_newFromFile("view/startup_settings_view.glade", GTK_WINDOW(created->window));
+    created->displayContinueBtn = viewModel.displayContinueButton;
+    private_configureCallbacks(created);
+    private_loadCssFromFile("css/theme.css");
 
-void private_newGame(MainMenuView* self, GtkButton* button)
+    return created;
+}
+IView* MainMenuView_asIView(MainMenuView* self)
+{
+    return self->iView;
+}
+void MainMenuView_destroy(MainMenuView *self)
+{
+    gtk_widget_destroy(self->window);
+    free(self);
+}
+void MainMenuView_display(MainMenuView *self)
+{
+    gtk_widget_show_all(self->window);
+    if (!self->displayContinueBtn)
+    {
+        gtk_widget_hide(self->continueBtn);
+    }
+}
+void MainMenuView_hide(MainMenuView *self)
+{
+    gtk_widget_hide(self->window);
+}
+
+void private_wrapper_destroy(void *vSelf)
+{
+    MainMenuView_destroy((MainMenuView *)vSelf);
+}
+void private_wrapper_display(void *vSelf)
+{
+    MainMenuView_display((MainMenuView *)vSelf);
+}
+void private_wrapper_hide(void *vSelf)
+{
+    MainMenuView_hide((MainMenuView *)vSelf);
+}
+void private_loadMembersFromXML(MainMenuView *self, const char *relativeFilename)
+{
+    GtkBuilder *builder = gtk_builder_new_from_file(relativeFilename);
+
+    self->window = GTK_WIDGET(gtk_builder_get_object(builder, "mainMenuWindow"));
+    self->exitBtn = GTK_WIDGET(gtk_builder_get_object(builder, "exitBtn"));
+    self->newGameBtn = GTK_WIDGET(gtk_builder_get_object(builder, "newGameBtn"));
+    self->howToPlayBtn = GTK_WIDGET(gtk_builder_get_object(builder, "howToPlayBtn"));
+    self->continueBtn = GTK_WIDGET(gtk_builder_get_object(builder, "continueBtn"));
+        
+}
+
+void private_configureCallbacks(MainMenuView *self)
+{
+    g_signal_connect_swapped(self->exitBtn, "clicked", G_CALLBACK(private_exitProgram), self->controllerAPI);
+    g_signal_connect_swapped(self->continueBtn, "clicked", G_CALLBACK(private_continueMatch), self->controllerAPI);
+    g_signal_connect_swapped(self->howToPlayBtn, "clicked", G_CALLBACK(private_howToPlay), self);
+    g_signal_connect_swapped(self->newGameBtn, "clicked", G_CALLBACK(private_newGame), self);
+}
+
+void private_loadCssFromFile(const char *relativeFilename)
+{
+    GFile *stylesheet = g_file_new_for_path(relativeFilename);
+    GtkCssProvider *cssProvider = gtk_css_provider_new();
+    gtk_css_provider_load_from_file(cssProvider, stylesheet, NULL);
+    gtk_style_context_add_provider_for_screen(
+        gdk_screen_get_default(),
+        GTK_STYLE_PROVIDER(cssProvider),
+        GTK_STYLE_PROVIDER_PRIORITY_USER);
+}
+void private_howToPlay(MainMenuView *self)
+{
+    gtk_dialog_run(GTK_DIALOG(HowToPlayDialog_getDialog(self->howToPlayDialog)));
+    gtk_widget_hide(HowToPlayDialog_getDialog(self->howToPlayDialog));
+}
+void private_newGame(MainMenuView *self, GtkButton *button)
 {
     gint dialogResponse = gtk_dialog_run(GTK_DIALOG(StartupSettingsDialog_getDialog(self->startupSettings)));
 
     if (dialogResponse == GTK_RESPONSE_ACCEPT)
     {
-        NewGameArgs args = { 
+        NewGameArgs args = {
             StartupSettingsDialog_getFilename(self->startupSettings),
-            StartupSettingsDialog_getHandicap(self->startupSettings)
-             };
-        GameController_beginMatch(self->controllerAPI, args); 
+            StartupSettingsDialog_getHandicap(self->startupSettings)};
+        IGameController_beginMatch(self->controllerAPI, args);
     }
     else if (dialogResponse == GTK_RESPONSE_CANCEL)
     {
-        // just close the dialog
-    }  
+        gtk_widget_hide(StartupSettingsDialog_getDialog(self->startupSettings));
+    }
     else
     {
         assert(0 && "We should've gotten here!\n");
     }
 }
-void private_continueMatch(GtkButton* button, gpointer data)
+void private_continueMatch(IGameController *controller)
 {
-    GameController_continueMatch((GameController*)data);
+    IGameController_continueMatch(controller);
 }
-
-void private_displayHowToPlay(GtkButton* button, gpointer data)
+void private_exitProgram(IGameController *controller)
 {
-    HowToPlayView_display((HowToPlayView*)data);
-}
-MainMenuView* MainMenuView_new(GameController* controllerAPI)
-{
-    MainMenuView* created = (MainMenuView*)malloc(sizeof(MainMenuView));
-    created->startupSettings = StartupSettingsDialog_newFromFile("view/startup_settings_view.glade");
-    created->controllerAPI = controllerAPI;
-
-    GtkBuilder* builder = gtk_builder_new();
-    GError* error = NULL;
-    if (gtk_builder_add_from_file(builder, "view/main_menu_view.glade", &error) == 0)
-    {
-        g_printerr("Error during loading file: %s\n", error->message);
-        g_clear_error(&error);
-    }
-    created->window = GTK_WIDGET(gtk_builder_get_object(builder, "mainMenuWindow"));
-    created->exitBtn = GTK_WIDGET(gtk_builder_get_object(builder, "exitBtn"));
-    created->newGameBtn = GTK_WIDGET(gtk_builder_get_object(builder, "newGameBtn"));
-    created->continueBtn = GTK_WIDGET(gtk_builder_get_object(builder, "continueBtn"));
-    created->howToPlayBtn = GTK_WIDGET(gtk_builder_get_object(builder, "howToPlayBtn"));
-
-    created->howToPlayView = HowToPlayView_new(controllerAPI, GTK_WINDOW(created->window));
-    g_signal_connect(created->exitBtn, "clicked", G_CALLBACK(private_exitProgram), controllerAPI);
-    // NewGameArgs* newGameArgs = NewGameArgs_new(
-    //     controllerAPI,
-    //     StartupSettingsDialog_getFilename(created->startupSettings),
-    //     StartupSettingsDialog_getHandicap(created->startupSettings)
-    // );
-    g_signal_connect_swapped(created->newGameBtn, "clicked", G_CALLBACK(private_newGame), created);
-    g_signal_connect(created->continueBtn, "clicked", G_CALLBACK(private_continueMatch), controllerAPI);
-    g_signal_connect(created->howToPlayBtn, "clicked", G_CALLBACK(private_displayHowToPlay), created->howToPlayView);
-
-    GFile* stylesheet = g_file_new_for_path("css/theme.css");
-    GtkCssProvider *cssProvider = gtk_css_provider_new();
-    gtk_css_provider_load_from_file(cssProvider, stylesheet, NULL);
-    gtk_style_context_add_provider_for_screen(gdk_screen_get_default(), GTK_STYLE_PROVIDER(cssProvider), GTK_STYLE_PROVIDER_PRIORITY_USER);
-    return created;
-}
-void MainMenuView_destroy(MainMenuView* self)
-{
-    gtk_widget_destroy(self->window);
-    free(self);
-}
-void MainMenuView_display(MainMenuView* self)
-{
-    gtk_widget_show_all(self->window);
-}
-void MainMenuView_displayContinueButton(MainMenuView* self)
-{
-    gtk_widget_show(self->continueBtn);
-}
-void MainMenuView_hideContinueButton(MainMenuView* self)
-{
-    gtk_widget_hide(self->continueBtn);
-}
-void MainMenuView_hide(MainMenuView* self)
-{
-    gtk_widget_hide(self->window);
-}
-
-void private_beginMatch(GtkButton* button, gpointer data)
-{
-    // GameController_beginMatch((GameController*)data);
-}
-
-void private_exitProgram(GtkButton* button, gpointer data)
-{
-    GameController_prepareForExit((GameController*)data);
+    IGameController_prepareForExit(controller);
     gtk_main_quit();
 }

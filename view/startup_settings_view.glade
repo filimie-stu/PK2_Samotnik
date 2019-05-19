@@ -106,7 +106,7 @@
               <object class="GtkLabel" id="label2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Play until "X" tokens:</property>
+                <property name="label" translatable="yes">Handicap tokens:</property>
               </object>
               <packing>
                 <property name="top_attach">1</property>

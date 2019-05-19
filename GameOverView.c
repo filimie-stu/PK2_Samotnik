@@ -6,15 +6,11 @@
 typedef struct game_over_view 
 {
     GtkWidget* dialog;
-    GameController* controllerAPI;
+    IGameController* controllerAPI;
 
 } GameOverView;
 
-void GameController_restartGame(GameController* controllerAPI);
-void GameController_endMatch(GameController* controllerAPI);
-void GameController_mainMenu(GameController* controllerAPI);
-
-GameOverView* GameOverView_new(GameController* controllerAPI, GtkWindow* parent, GameOverViewModel viewModel)
+GameOverView* GameOverView_new(IGameController* controllerAPI, GtkWindow* parent, GameOverViewModel viewModel)
 {
     GameOverView* created = (GameOverView*)malloc(sizeof(GameOverView)) ;
     GtkBuilder *builder = gtk_builder_new_from_file("view/game_over_view.glade");
@@ -41,11 +37,11 @@ void GameOverView_display(GameOverView* self)
     switch (dialogResponse)
     {
     case 0:
-        GameController_restartGame(self->controllerAPI);
+        IGameController_restartGame(self->controllerAPI);
         break;
     case 1:
-        GameController_endMatch(self->controllerAPI);
-        GameController_mainMenu(self->controllerAPI);
+        IGameController_endMatch(self->controllerAPI);
+        IGameController_mainMenu(self->controllerAPI);
         break;
     default:
         break;
