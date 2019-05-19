@@ -96,8 +96,11 @@ void GameController_beginMatch(GameController *self, NewGameArgs settings)
 }
 void GameController_rollback(GameController *self)
 {
-    IBoard_rollbackJump(self->board, IJumpHistory_extract(self->jumpHistory));
-    IScore_decrement(self->score);
+    if (!IJumpHistory_isEmpty(self->jumpHistory))
+    {
+        IBoard_rollbackJump(self->board, IJumpHistory_extract(self->jumpHistory));
+        IScore_decrement(self->score);
+    }
 }
 
 void GameController_prepareForExit(GameController *self)
@@ -112,6 +115,9 @@ void GameController_restartGame(GameController *self)
 
     IScore_destroy(self->score, 1);
     self->score = IModelFactory_createScore(self->modelFactory, IBoard_countTokens(self->board), self->lastUsedSettings.handicap);
+
+    IJumpHistory_destroy(self->jumpHistory,1);
+    self->jumpHistory = IModelFactory_createJumpHistory(self->modelFactory);
 
     IView_destroy(self->matchView, 1);
     MatchViewModel viewModel = {private_boardToViewModel(self->board),

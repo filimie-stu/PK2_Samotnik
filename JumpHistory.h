@@ -9,3 +9,4 @@ IJumpHistory* JumpHistory_asIJumpHistory(JumpHistory* self);
 void JumpHistory_destroy(JumpHistory* self);
 JumpInfo JumpHistory_extract(JumpHistory* self);
 void JumpHistory_addRecord(JumpHistory* self, JumpInfo jumpData);
+int JumpHistory_isEmpty(JumpHistory* self);

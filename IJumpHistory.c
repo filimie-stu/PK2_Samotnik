@@ -7,6 +7,7 @@ typedef struct i_jump_history
     void *implementationObject;
     void (*destroyOverride)(void *implObject);
     void (*addRecordOverride)(void *implObject, JumpInfo jumpData);
+    int (*isEmptyOverride)(void* implObject);
     JumpInfo (*extractOverride)(void *impleObject);
 
 } IJumpHistory;
@@ -15,10 +16,11 @@ IJumpHistory *IJumpHistory_new(
     void *implementationObject,
     void (*destroyOverride)(void *implObject),
     void (*addRecordOverride)(void *implObject, JumpInfo jumpData),
+    int (*isEmptyOverride)(void* implObject),
     JumpInfo (*extractOverride)(void *impleObject))
 {
 
-    if (!implementationObject || !destroyOverride || !addRecordOverride || !extractOverride)
+    if (!implementationObject || !isEmptyOverride || !destroyOverride || !addRecordOverride || !extractOverride)
     {
         printf("Error: NULL passed as interface override.\n");
     }
@@ -28,7 +30,7 @@ IJumpHistory *IJumpHistory_new(
     created->destroyOverride = destroyOverride;
     created->addRecordOverride = addRecordOverride;
     created->extractOverride = extractOverride;
-
+    created->isEmptyOverride = isEmptyOverride;
     return created;
 }
 void IJumpHistory_destroy(IJumpHistory *self, int destroyDerivedTypes)
@@ -49,4 +51,8 @@ JumpInfo IJumpHistory_extract(IJumpHistory *self)
 void IJumpHistory_addRecord(IJumpHistory *self, JumpInfo jumpData)
 {
     self->addRecordOverride(self->implementationObject, jumpData);
+}
+int IJumpHistory_isEmpty(IJumpHistory* self)
+{
+    return self->isEmptyOverride(self->implementationObject);
 }

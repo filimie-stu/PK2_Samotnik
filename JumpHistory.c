@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <string.h>
 
-#define MAX_RECORDS 30
+#define MAX_RECORDS 200
 typedef struct jump_history
 {
     IJumpHistory *iJumpHistory;
@@ -15,7 +15,12 @@ typedef struct jump_history
 static void private_wrapper_destroy(void *vSelf);
 static void private_wrapper_addRecord(void *vSelf, JumpInfo jumpData);
 static JumpInfo private_wrapper_extract(void *vSelf);
+static int private_wrapper_isEmpty(void *vSelf);
 
+static int private_wrapper_isEmpty(void *vSelf)
+{
+    return JumpHistory_isEmpty((JumpHistory *)vSelf);
+}
 void private_wrapper_destroy(void *vSelf)
 {
     //todo
@@ -28,7 +33,10 @@ JumpInfo private_wrapper_extract(void *vSelf)
 {
     return JumpHistory_extract((JumpHistory *)vSelf);
 }
-
+int JumpHistory_isEmpty(JumpHistory *self)
+{
+    return self->recordedCount <= 0;
+}
 JumpHistory *JumpHistory_new()
 {
     JumpHistory *created = (JumpHistory *)malloc(sizeof(JumpHistory));
@@ -37,8 +45,8 @@ JumpHistory *JumpHistory_new()
         created,
         private_wrapper_destroy,
         private_wrapper_addRecord,
-        private_wrapper_extract
-    );
+        private_wrapper_isEmpty,
+        private_wrapper_extract);
     return created;
 }
 void JumpHistory_destroy(JumpHistory *self)
