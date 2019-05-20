@@ -10,10 +10,12 @@ IScore *IScore_new(
     int (*getPointsOverride)(void *implObject),
     int (*getGoalOverride)(void *implObject),
     void (*incrementOverride)(void* implObject),
-    void (*decrementOverride)(void* implObject));
+    void (*decrementOverride)(void* implObject),
+    int (*hasWonOverride)(void* implObject));
 Observable *IScore_asObservable(IScore *self);
 void IScore_destroy(IScore *self, int destroyDerivedTypes);
 void IScore_increment(IScore* self);
 void IScore_decrement(IScore* self);
 int IScore_getPoints(IScore *self);
 int IScore_getGoal(IScore *self);
+int IScore_hasWon(IScore* self);

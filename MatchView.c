@@ -13,8 +13,6 @@ typedef struct match_view
 {
     IView *iView;
     IGameController *controllerAPI;
-    Observer *observingBoard;
-    Observer *observingScore;
 
     GtkWidget *window;
     GtkWidget *mainMenuButton;
@@ -27,7 +25,6 @@ typedef struct match_view
     GtkContainer *scoreAnchorPoint;
     ScoreView *scoreView;
 
-    GameOverView *gameOverDialog;
 
 } MatchView;
 
@@ -41,23 +38,6 @@ static void private_wrapper_hide(void *vSelf);
 IView *MatchView_asIView(MatchView *self)
 {
     return self->iView;
-}
-void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
-{
-    if (strncmp(signalID, "dead_end", strlen(signalID)) == 0)
-    {
-        MatchView *self = (MatchView *)vSelf;
-        GameOverViewModel viewModel = {"You lose!", "There are no more possible moves"};
-        self->gameOverDialog = GameOverView_new(self->controllerAPI, GTK_WINDOW(self->window), viewModel);
-        GameOverView_display(self->gameOverDialog);
-    }
-    else if (strncmp(signalID, "goal_achieved", strlen(signalID)) == 0)
-    {
-        MatchView *self = (MatchView *)vSelf;
-        GameOverViewModel viewModel = {"You win!", "There's only one token left, congratulations!"};
-        self->gameOverDialog = GameOverView_new(self->controllerAPI, GTK_WINDOW(self->window), viewModel);
-        GameOverView_display(self->gameOverDialog);
-    }
 }
 void private_loadMembersFromXML(MatchView* self)
 {
@@ -87,8 +67,6 @@ MatchView *MatchView_new(IGameController* controllerAPI, MatchViewModel viewMode
         private_wrapper_hide);
     
     created->controllerAPI = controllerAPI;
-    created->observingBoard = Observer_new(created, private_recieveSignal, viewModel.boardVM.boardObservable);
-    created->observingScore = Observer_new(created, private_recieveSignal, viewModel.scoreVM.scoreObservable);
     
     private_loadMembersFromXML(created);
 

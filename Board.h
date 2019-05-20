@@ -31,3 +31,4 @@ void Board_rollbackJump(Board* self, JumpInfo jumpData);
 Vector2D Board_getDimensions(Board* self);
 FieldType Board_getFieldAt(Board* self, Vector2D at);
 int Board_countTokens(Board* self);
+int Board_isDeadEnd(Board* self);

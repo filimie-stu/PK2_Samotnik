@@ -13,6 +13,7 @@ typedef struct i_board
     FieldType (*getFieldAtOverride)(void *implObject, Vector2D at);
     Vector2D (*getDimensionsOverride)(void *implObject);
     int(*countTokensOverride)(void* implObject);
+    int(*isDeadEndOverride)(void* implObject);
 
     Observable *observable;
 
@@ -38,14 +39,16 @@ IBoard *IBoard_new(
     void (*rollbackJumpOverride)(void *implObjet, JumpInfo jumpData),
     FieldType (*getFieldAtOverride)(void *implObject, Vector2D at),
     Vector2D (*getDimensionsOverride)(void *implObject),
-    int(*countTokensOverride)(void* implObject)
+    int(*countTokensOverride)(void* implObject),
+    int (*isDeadEndOverride)(void* implObject)
 
 )
 {
     if (!implObject || !destroyOverride ||
         !tryJumpOverride || !tryActivateOverride ||
         !rollbackJumpOverride || !getFieldAtOverride ||
-        !getDimensionsOverride || !countTokensOverride)
+        !getDimensionsOverride || !countTokensOverride ||
+        !isDeadEndOverride)
     {
         printf("Error: NULL passed as interface override.\n");
     }
@@ -59,10 +62,14 @@ IBoard *IBoard_new(
     created->getDimensionsOverride = getDimensionsOverride;
     created->getFieldAtOverride = getFieldAtOverride;
     created->countTokensOverride=countTokensOverride;
-
+    created->isDeadEndOverride=isDeadEndOverride;
     created->observable = Observable_new(created);
 
     return created;
+}
+int IBoard_isDeadEnd(IBoard* self)
+{
+    self->isDeadEndOverride(self->implObject);
 }
 void IBoard_destroy(IBoard *self, int destroyDerivedTypes)
 {

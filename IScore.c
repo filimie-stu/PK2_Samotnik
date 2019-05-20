@@ -9,6 +9,7 @@ typedef struct i_score
     int (*getGoalOverride)(void *implObject);
     void (*incrementOverride)(void *implObject);
     void (*decrementOverride)(void *implObject);
+    int (*hasWonOverride)(void* implObject);
     Observable *observable;
 } IScore;
 
@@ -17,9 +18,10 @@ IScore *IScore_new(
     int (*getPointsOverride)(void *implObject),
     int (*getGoalOverride)(void *implObject),
     void (*incrementOverride)(void *implObject),
-    void (*decrementOverride)(void *implObject))
+    void (*decrementOverride)(void *implObject),
+    int(*hasWonOverride)(void* implObject))
 {
-    if (!implObject || !getPointsOverride || !getGoalOverride || !incrementOverride || !decrementOverride)
+    if (!implObject || !getPointsOverride || !getGoalOverride || !incrementOverride || !decrementOverride || !hasWonOverride)
     {
         printf("Error: NULL passed as interface override.\n");
     }
@@ -29,7 +31,7 @@ IScore *IScore_new(
     created->getPointsOverride = getPointsOverride;
     created->incrementOverride = incrementOverride;
     created->decrementOverride = decrementOverride;
-
+    created->hasWonOverride = hasWonOverride;
     created->observable = Observable_new(created);
 
     return created;
@@ -61,4 +63,8 @@ void IScore_increment(IScore *self)
 void IScore_decrement(IScore *self)
 {
     self->decrementOverride(self->implementationObject);
+}
+int IScore_hasWon(IScore* self)
+{
+    self->hasWonOverride(self->implementationObject);
 }

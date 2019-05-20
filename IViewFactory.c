@@ -8,15 +8,19 @@ typedef struct i_view_factory
     void (*destroyOverride)(void *implSelf);
     IView *(*createMatchViewOverride)(void *implSelf, IGameController *controllerAPI, MatchViewModel vm);
     IView *(*createMainMenuViewOverride)(void *implSelf, IGameController *controllerAPI, MainMenuViewModel vm);
+    IView *(*createGameOverViewOverride)(void *implSelf, IGameController *controllerAPI, GameOverViewModel vm);
+
 } IViewFactory;
 
 IViewFactory *IViewFactory_new(
     void *implementationObject,
     void (*destroyOverride)(void *implSelf),
     IView *(*createMatchViewOverride)(void *implSelf, IGameController *controllerAPI, MatchViewModel vm),
-    IView *(*createMainMenuViewOverride)(void *implSelf, IGameController *controllerAPI, MainMenuViewModel vm))
+    IView *(*createMainMenuViewOverride)(void *implSelf, IGameController *controllerAPI, MainMenuViewModel vm),
+    IView *(*createGameOverViewOverride)(void *implSelf, IGameController *controllerAPI, GameOverViewModel vm))
+
 {
-    if (!implementationObject || !destroyOverride || !createMatchViewOverride || !createMainMenuViewOverride)
+    if (!implementationObject || !destroyOverride || !createMatchViewOverride || !createMainMenuViewOverride || !createGameOverViewOverride)
     {
         printf("Error: NULL passed as interface override.\n");
     }
@@ -25,7 +29,7 @@ IViewFactory *IViewFactory_new(
     created->destroyOverride = destroyOverride;
     created->createMatchViewOverride = createMatchViewOverride;
     created->createMainMenuViewOverride = createMainMenuViewOverride;
-
+    created->createGameOverViewOverride = createGameOverViewOverride;
     return created;
 }
 
@@ -49,4 +53,9 @@ void IViewFactory_destroy(IViewFactory *self, int destroyDerivedTypes)
     {
         free(self);
     }
+}
+
+IView* IViewFactory_createGameOverView(IViewFactory* self, IGameController *controllerAPI, GameOverViewModel vm)
+{
+    return self->createGameOverViewOverride(self->implementationObject, controllerAPI, vm);
 }

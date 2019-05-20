@@ -14,41 +14,46 @@ static void private_getJumpableFields(Board *self, Field *from, Field *out_field
 static int private_loadDimensions(Board *incompleteSelf, FILE *sourceFile);
 static int private_loadFields(Board *incompleteSelf, FILE *sourceFile);
 static Field *private_fieldAt(Board *self, Vector2D at);
-static int private_isDeadEndState(Board *self);
 static int private_jumpsPossibleFrom(Board *self, Field *from);
 static void private_applyJump(Board *self, JumpInfo jump);
-static int private_wrapper_tryJump(void *vSelf, Vector2D from, Vector2D to, JumpInfo* out_jumpData);
+static int private_wrapper_tryJump(void *vSelf, Vector2D from, Vector2D to, JumpInfo *out_jumpData);
 static int private_wrapper_tryActivate(void *vSelf, Vector2D at);
 static void private_wrapper_rollbackJump(void *vSelf, JumpInfo jumpData);
 static void private_wrapper_destroy(void *vSelf);
 static FieldType private_wrapper_getFieldAt(void *vSelf, Vector2D at);
 static Vector2D private_wrapper_getDimensions(void *vSelf);
-static int private_wrapper_countTokens(void* vSelf);
+static int private_wrapper_countTokens(void *vSelf);
+static int private_wrapper_isDeadEnd(void *vSelf);
 
-int private_wrapper_countTokens(void* vSelf)
+int private_wrapper_isDeadEnd(void* vSelf)
 {
-    return Board_countTokens((Board*)vSelf);
+    return Board_isDeadEnd((Board*)vSelf);
 }
 
-Observable* Board_asObservable(Board* self)
+int private_wrapper_countTokens(void *vSelf)
+{
+    return Board_countTokens((Board *)vSelf);
+}
+
+Observable *Board_asObservable(Board *self)
 {
     return IBoard_asObservable(self->iBoard);
 }
-int Board_countTokens(Board* self)
+int Board_countTokens(Board *self)
 {
     int count = 0;
     for (int i = 0; i < self->dimensions.x; i++)
     {
         for (int j = 0; j < self->dimensions.y; j++)
         {
-            Vector2D at = { i, j };
+            Vector2D at = {i, j};
             if (Board_getFieldAt(self, at) == REGULAR_TOKEN || Board_getFieldAt(self, at) == ACTIVE_TOKEN)
             {
                 count++;
             }
         }
     }
-    return count;    
+    return count;
 }
 FieldType private_wrapper_getFieldAt(void *vSelf, Vector2D at)
 {
@@ -67,7 +72,7 @@ FieldType Board_getFieldAt(Board *self, Vector2D at)
 {
     return private_fieldAt(self, at)->contents;
 }
-int private_wrapper_tryJump(void *vSelf, Vector2D from, Vector2D to, JumpInfo* out_jumpData)
+int private_wrapper_tryJump(void *vSelf, Vector2D from, Vector2D to, JumpInfo *out_jumpData)
 {
     return Board_tryJump((Board *)vSelf, from, to, out_jumpData);
 }
@@ -109,8 +114,8 @@ Board *Board_newFromFile(const char *relativePath)
         private_wrapper_rollbackJump,
         private_wrapper_getFieldAt,
         private_wrapper_getDimensions,
-        private_wrapper_countTokens
-        );
+        private_wrapper_countTokens,
+        private_wrapper_isDeadEnd);
     created->activeField = NULL;
     created->tokenCount = 0;
 
@@ -143,7 +148,7 @@ void Board_destroy(Board *self)
     free(self);
 }
 
-int Board_tryJump(Board *self, Vector2D from, Vector2D to, JumpInfo* out_jumpData)
+int Board_tryJump(Board *self, Vector2D from, Vector2D to, JumpInfo *out_jumpData)
 {
     Field *fromField = private_fieldAt(self, from);
     Field *toField = private_fieldAt(self, to);
@@ -168,7 +173,7 @@ int Board_tryJump(Board *self, Vector2D from, Vector2D to, JumpInfo* out_jumpDat
             assert(attackedField != NULL && "This should've been already null-checked by 'getJumpableFields'");
 
             JumpInfo jump = {from, attackedField->coords, to};
-            *out_jumpData = jump; 
+            *out_jumpData = jump;
             private_applyJump(self, jump);
             return 1;
         }
@@ -204,7 +209,19 @@ int Board_tryActivate(Board *self, Vector2D at)
     Observable_notifyObservers(Board_asObservable(self), "activate", &activationArgs);
     return 1;
 }
-
+int Board_isDeadEnd(Board *self)
+{
+    for (int i = 0; i < self->dimensions.x; i++)
+    {
+        for (int j = 0; j < self->dimensions.y; j++)
+        {
+            Field *field = private_fieldAt(self, Vector2D_create(i, j));
+            if (private_jumpsPossibleFrom(self, field))
+                return 0;
+        }
+    }
+    return 1;
+}
 void private_applyJump(Board *self, JumpInfo jump)
 {
     private_fieldAt(self, jump.from)->contents = EMPTY;
@@ -212,11 +229,6 @@ void private_applyJump(Board *self, JumpInfo jump)
     private_fieldAt(self, jump.to)->contents = REGULAR_TOKEN;
 
     Observable_notifyObservers(Board_asObservable(self), "jump", &jump);
-
-    if (private_isDeadEndState(self))
-    {
-        Observable_notifyObservers(Board_asObservable(self), "dead_end", NULL);
-    }
 }
 int private_loadDimensions(Board *incompleteSelf, FILE *sourceFile)
 {
@@ -319,17 +331,4 @@ int private_jumpsPossibleFrom(Board *self, Field *from)
     }
 
     return 0;
-}
-int private_isDeadEndState(Board *self)
-{
-    for (int i = 0; i < self->dimensions.x; i++)
-    {
-        for (int j = 0; j < self->dimensions.y; j++)
-        {
-            Field *field = private_fieldAt(self, Vector2D_create(i, j));
-            if (private_jumpsPossibleFrom(self, field))
-                return 0;
-        }
-    }
-    return 1;
 }

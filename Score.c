@@ -26,6 +26,11 @@ int private_wrapper_getGoal(void* vSelf)
     return Score_getGoal((Score*)vSelf);
 }
 
+int private_wrapper_hasWon(void* vSelf)
+{
+    return Score_hasWon((Score*)vSelf);
+}
+
 Score *Score_new(int goal, int handicap)
 
 {
@@ -35,7 +40,8 @@ Score *Score_new(int goal, int handicap)
         private_wrapper_getPoints,
         private_wrapper_getGoal,
         private_wrapper_increment,
-        private_wrapper_decrement
+        private_wrapper_decrement,
+        private_wrapper_hasWon
     );
     created->goal = goal;
     created->takedowns = 0;
@@ -56,11 +62,10 @@ int Score_getGoal(Score* self)
     return self->goal;
 }
 
-int private_goalAchieved(Score *self)
+int Score_hasWon(Score* self)
 {
     return self->takedowns + self->handicap >= self->goal;
 }
-
 IScore* Score_asIScore(Score* self)
 {
     return self->iScore;
@@ -74,11 +79,6 @@ void Score_increment(Score *self)
     self->takedowns++;
     SyncScoreArgs args = {self->takedowns, self->goal - self->takedowns};
     Observable_notifyObservers(Score_asObservable(self), "sync_score", &args);
-
-    if (private_goalAchieved(self))
-    {
-        Observable_notifyObservers(Score_asObservable(self), "goal_achieved", &args);
-    }
 }
 
 void Score_decrement(Score *self)

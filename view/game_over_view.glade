@@ -3,7 +3,7 @@
 <interface>
   <requires lib="gtk+" version="2.24" />
   <!-- interface-naming-policy project-wide -->
-  <object class="GtkDialog" id="gameOverDialog">
+  <object class="GtkWindow" id="gameOverWindow">
     <property name="can_focus">False</property>
     <property name="border_width">7</property>
     <property name="title" translatable="yes">Game over</property>

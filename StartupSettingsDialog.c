@@ -22,6 +22,7 @@ StartupSettingsDialog *StartupSettingsDialog_newFromFile(const char* relativeFil
     gtk_window_set_transient_for(GTK_WINDOW(created->dialog), parentWindow);
     gtk_spin_button_set_range(GTK_SPIN_BUTTON(created->handicapSpinnerBtn), 0, 5);
     gtk_spin_button_set_increments(GTK_SPIN_BUTTON(created->handicapSpinnerBtn), 1, 1);
+
     return created;
 }
 void StartupSettingsDialog_destroy(StartupSettingsDialog* self)
@@ -41,5 +42,7 @@ int StartupSettingsDialog_getHandicap(StartupSettingsDialog* self)
 
 const char* StartupSettingsDialog_getFilename(StartupSettingsDialog* self)
 {
-    return gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(self->filePickerBtn));
+    const char* filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(self->filePickerBtn));
+    
+    return filename ? filename : "data/board.board";
 }

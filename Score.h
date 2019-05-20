@@ -16,3 +16,4 @@ void Score_increment(Score* self);
 void Score_decrement(Score *self);
 int Score_getPoints(Score* self);
 int Score_getGoal(Score* self);
+int Score_hasWon(Score* self);
