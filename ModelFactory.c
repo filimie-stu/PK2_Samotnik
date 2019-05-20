@@ -13,16 +13,22 @@ typedef struct model_factory
 static IBoard *private_wrapper_createBoard(void *vSelf, const char *relativeFilename);
 static IScore *private_wrapper_createScore(void *vSelf, int goal, int handicap);
 static IJumpHistory *private_wrapper_createJumpHistory(void *vSelf);
+static void private_wrapper_destroy(void *vSelf);
 
-static IBoard *private_wrapper_createBoard(void *vSelf, const char *relativeFilename)
+void private_wrapper_destroy(void *vSelf)
+{
+    ModelFactory_destroy((ModelFactory *)vSelf);
+}
+
+IBoard *private_wrapper_createBoard(void *vSelf, const char *relativeFilename)
 {
     return ModelFactory_createBoard((ModelFactory *)vSelf, relativeFilename);
 }
-static IScore *private_wrapper_createScore(void *vSelf, int goal, int handicap)
+IScore *private_wrapper_createScore(void *vSelf, int goal, int handicap)
 {
     return ModelFactory_createScore((ModelFactory *)vSelf, goal, handicap);
 }
-static IJumpHistory *private_wrapper_createJumpHistory(void *vSelf)
+IJumpHistory *private_wrapper_createJumpHistory(void *vSelf)
 {
     return ModelFactory_createJumpHistory((ModelFactory *)vSelf);
 }
@@ -38,11 +44,13 @@ ModelFactory *ModelFactory_new()
         created,
         private_wrapper_createBoard,
         private_wrapper_createScore,
-        private_wrapper_createJumpHistory);
+        private_wrapper_createJumpHistory,
+        private_wrapper_destroy);
     return created;
 }
 void ModelFactory_destroy(ModelFactory *self)
 {
+    IModelFactory_destroy(self->iModelFactory, 0);
     free(self);
 }
 IBoard *ModelFactory_createBoard(ModelFactory *self, const char *relativeFilename)

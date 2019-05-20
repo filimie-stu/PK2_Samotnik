@@ -69,7 +69,7 @@ IBoard *IBoard_new(
 }
 int IBoard_isDeadEnd(IBoard* self)
 {
-    self->isDeadEndOverride(self->implObject);
+    return self->isDeadEndOverride(self->implObject);
 }
 void IBoard_destroy(IBoard *self, int destroyDerivedTypes)
 {
@@ -79,6 +79,7 @@ void IBoard_destroy(IBoard *self, int destroyDerivedTypes)
     }
     else
     {
+        Observable_destroy(self->observable);
         free(self);
     }
 }

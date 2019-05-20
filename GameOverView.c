@@ -14,6 +14,13 @@ static void private_wrapper_destroy(void *vSelf);
 static void private_wrapper_display(void *vSelf);
 static void private_wrapper_hide(void *vSelf);
 
+void GameOverView_destroy(GameOverView *self)
+{
+    gtk_widget_destroy(self->window);
+    IView_destroy(self->iView, 0);
+    free(self);
+}
+
 void private_wrapper_destroy(void *vSelf)
 {
     GameOverView_destroy((GameOverView*)vSelf);
@@ -61,12 +68,6 @@ GameOverView *GameOverView_new(IGameController *controllerAPI, GameOverViewModel
 
     return created;
 }
-void GameOverView_destroy(GameOverView *self)
-{
-    gtk_widget_destroy(self->window);
-    free(self);
-}
-
 void GameOverView_display(GameOverView *self)
 {
     gtk_widget_show_all(self->window);

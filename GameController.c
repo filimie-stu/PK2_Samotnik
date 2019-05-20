@@ -10,6 +10,7 @@
 #include "IViewFactory.h"
 #include "IGameController.h"
 #include "GameControllerTypeWrappers.h"
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -17,19 +18,50 @@
 typedef struct game_controller
 {
     IGameController *iGameController;
+
     IModelFactory *modelFactory;
     IViewFactory *viewFactory;
+
     IBoard *board;
     IScore *score;
     IJumpHistory *jumpHistory;
-    // Observer* observingIBoard;
 
     IView *matchView;
     IView *mainMenuView;
     IView *gameOverView;
+
     NewGameArgs lastUsedSettings;
 
 } GameController;
+
+void GameController_destroy(GameController *self)
+{
+    assert(self->gameOverView == NULL);
+
+    if (self->matchView)
+    {
+        IView_destroy(self->matchView, 1);
+    }
+    if (self->mainMenuView)
+    {
+        IView_destroy(self->mainMenuView, 1);
+    }
+    if (self->board)
+    {
+        IBoard_destroy(self->board, 1);
+    }
+    if (self->score)
+    {
+        IScore_destroy(self->score, 1);
+    }
+    if (self->jumpHistory)
+    {
+        IJumpHistory_destroy(self->jumpHistory, 1);
+    }
+
+    IGameController_destroy(self->iGameController, 0);
+    free(self);
+}
 
 static int private_gameGoing(GameController *self);
 static BoardViewModel private_boardToViewModel(IBoard *board);
@@ -192,20 +224,6 @@ void GameController_activate(GameController *self, Vector2D at)
     {
         printf("Error: invalid activation data.\n");
     }
-}
-
-void GameController_destroy(GameController *self)
-{
-    if (self->matchView)
-    {
-        IView_destroy(self->matchView, 1);
-    }
-    if (self->mainMenuView)
-    {
-        IView_destroy(self->mainMenuView, 1);
-    }
-    IGameController_destroy(self->iGameController, 0);
-    free(self);
 }
 
 void GameController_mainMenu(GameController *self)

@@ -11,15 +11,7 @@ typedef enum
     NO_ACTION, JUMP, ACTIVATE_TOKEN
 } ClickResult;
 
-typedef struct board 
-{
-    IBoard* iBoard;
-    Vector2D dimensions;
-    Field** fields;
-    Field* activeField;
-
-    int tokenCount;
-} Board;
+typedef struct board Board;
 
 Board* Board_newFromFile(const char* relativePath);
 void Board_destroy(Board* self);

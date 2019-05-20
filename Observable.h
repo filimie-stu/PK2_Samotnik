@@ -10,7 +10,7 @@ typedef struct observable Observable;
 
 Observable* Observable_new(void *implementationObj);
 
-void Observable_dispose(Observable* self);
+void Observable_destroy(Observable* self);
 void Observable_notifyObservers(Observable *self, const char* signalID, void *signalArgs);
 void Observable_addObserver(Observable *self, Observer* o);
 void Observable_removeObserver(Observable *self, Observer* o);

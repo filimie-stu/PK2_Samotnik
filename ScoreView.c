@@ -19,6 +19,12 @@ static void private_syncScore(ScoreView* self, SyncScoreArgs args);
 static void private_setInitialValues(ScoreView* self, ScoreViewModel viewModel);
 static void private_loadMembersFromXML(ScoreView* self);
 
+
+void ScoreView_destroy(ScoreView* self)
+{
+    Observer_destroy(self->scoreObserver);
+    free(self);
+}
 void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
 {
     if (strncmp(signalID, "sync_score", strlen(signalID)) == 0)
@@ -71,7 +77,3 @@ ScoreView* ScoreView_new(IGameController* controllerAPI, ScoreViewModel score, G
     return created;
 }
 
-void ScoreView_destroy(ScoreView* self)
-{
-    free(self);
-}

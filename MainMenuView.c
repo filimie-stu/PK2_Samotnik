@@ -59,6 +59,8 @@ IView* MainMenuView_asIView(MainMenuView* self)
 void MainMenuView_destroy(MainMenuView *self)
 {
     gtk_widget_destroy(self->window);
+    StartupSettingsDialog_destroy(self->startupSettings);
+    HowToPlayDialog_destroy(self->howToPlayDialog);
     free(self);
 }
 void MainMenuView_display(MainMenuView *self)

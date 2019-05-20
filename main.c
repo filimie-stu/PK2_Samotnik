@@ -16,8 +16,11 @@ int main (int argc, char* argv[])
         GtkViewFactory_asIViewFactory(viewFactory));
 
     GameController_mainMenu(controller);
-
     gtk_main();
 
+
+    GameController_destroy(controller);
+    ModelFactory_destroy(modelFactory);
+    GtkViewFactory_destroy(viewFactory);
     return 0;
 }

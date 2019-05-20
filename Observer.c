@@ -19,7 +19,7 @@ Observer* Observer_new(void* implementationObj, void(*notifyOverride)(void* impl
     
     return created;
 }
-void Observer_dispose(Observer* self)
+void Observer_destroy(Observer* self)
 {
     free(self);
 }

@@ -28,6 +28,12 @@ typedef enum view_field_type
 
 } ViewFieldType;
 
+void BoardView_destroy(BoardView *self)
+{
+    Observer_destroy(self->observer);
+    free(self);
+}
+
 static void private_updateAt(BoardView *self, Vector2D at, const char *newLabel);
 static GtkWidget *private_fieldAt(BoardView *self, Vector2D at);
 static ViewFieldType private_determineFieldType(BoardView *self, Vector2D fieldCoords);
@@ -57,10 +63,7 @@ BoardView *BoardView_new(IGameController *controllerAPI, BoardViewModel board, G
 
     return created;
 }
-void BoardView_destroy(BoardView *self)
-{
-    free(self);
-}
+
 void BoardView_display(BoardView *self)
 {
     if (!self->boardGrid)

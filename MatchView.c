@@ -80,6 +80,9 @@ MatchView *MatchView_new(IGameController* controllerAPI, MatchViewModel viewMode
 void MatchView_destroy(MatchView *self)
 {
     gtk_widget_destroy(self->window);
+    BoardView_destroy(self->boardView);
+    ScoreView_destroy(self->scoreView);
+    IView_destroy(self->iView, 0);
     free(self);
 }
 void MatchView_display(MatchView *self)

@@ -7,7 +7,12 @@ static int private_wrapper_getPoints(void* vSelf);
 static int private_wrapper_getGoal(void* vSelf);
 static void private_wrapper_increment(void* vSelf);
 static void private_wrapper_decrement(void* vSelf);
+static void private_wrapper_destroy(void* vSelf);
 
+void private_wrapper_destroy(void* vSelf)
+{
+    Score_destroy((Score*)vSelf);
+}
 void private_wrapper_increment(void* vSelf)
 {
     Score_increment((Score*)vSelf);
@@ -41,7 +46,8 @@ Score *Score_new(int goal, int handicap)
         private_wrapper_getGoal,
         private_wrapper_increment,
         private_wrapper_decrement,
-        private_wrapper_hasWon
+        private_wrapper_hasWon,
+        private_wrapper_destroy
     );
     created->goal = goal;
     created->takedowns = 0;

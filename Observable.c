@@ -66,7 +66,7 @@ Observable *Observable_new(void *implementationObj)
     return created;
 }
 
-void Observable_dispose(Observable *self)
+void Observable_destroy(Observable *self)
 {
     free(self);
 }

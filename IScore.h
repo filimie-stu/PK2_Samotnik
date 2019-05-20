@@ -11,7 +11,8 @@ IScore *IScore_new(
     int (*getGoalOverride)(void *implObject),
     void (*incrementOverride)(void* implObject),
     void (*decrementOverride)(void* implObject),
-    int (*hasWonOverride)(void* implObject));
+    int (*hasWonOverride)(void* implObject),
+    void (*destroyOverride)(void* implObject));
 Observable *IScore_asObservable(IScore *self);
 void IScore_destroy(IScore *self, int destroyDerivedTypes);
 void IScore_increment(IScore* self);

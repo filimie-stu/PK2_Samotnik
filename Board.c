@@ -9,6 +9,18 @@
 #include <math.h>
 #include <assert.h>
 
+typedef struct board 
+{
+    IBoard* iBoard;
+    Vector2D dimensions;
+    Field** fields;
+    Field* activeField;
+
+    int tokenCount;
+} Board;
+
+
+
 static Field *private_getNeighbourOf(Board *self, Field *field, Direction dir);
 static void private_getJumpableFields(Board *self, Field *from, Field *out_fields[4]);
 static int private_loadDimensions(Board *incompleteSelf, FILE *sourceFile);
@@ -24,6 +36,19 @@ static FieldType private_wrapper_getFieldAt(void *vSelf, Vector2D at);
 static Vector2D private_wrapper_getDimensions(void *vSelf);
 static int private_wrapper_countTokens(void *vSelf);
 static int private_wrapper_isDeadEnd(void *vSelf);
+
+
+
+void Board_destroy(Board *self)
+{
+    IBoard_destroy(self->iBoard, 0);
+    self->iBoard = NULL;
+
+    for (int i = 0; i < self->dimensions.y; i++)
+        free(self->fields[i]); // free the subarrays
+    free(self->fields);        // free the array of subarrays
+    free(self);
+}
 
 int private_wrapper_isDeadEnd(void* vSelf)
 {
@@ -140,13 +165,6 @@ Board *Board_newFromFile(const char *relativePath)
     return created;
 }
 
-void Board_destroy(Board *self)
-{
-    for (int i = 0; i < self->dimensions.y; i++)
-        free(self->fields[i]); // free the subarrays
-    free(self->fields);        // free the array of subarrays
-    free(self);
-}
 
 int Board_tryJump(Board *self, Vector2D from, Vector2D to, JumpInfo *out_jumpData)
 {
