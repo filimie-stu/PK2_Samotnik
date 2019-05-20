@@ -55,6 +55,7 @@ void private_configureCallbacks(MatchView* self)
     g_signal_connect(self->mainMenuButton, "clicked", G_CALLBACK(private_mainMenu), self->controllerAPI);
     g_signal_connect(self->resetButton, "clicked", G_CALLBACK(private_restartGame), self->controllerAPI);
     g_signal_connect(self->rollbackButton, "clicked", G_CALLBACK(private_rollbackJump), self->controllerAPI);
+    g_signal_connect(self->window, "delete-event", gtk_main_quit, NULL);
 }
 
 MatchView *MatchView_new(IGameController* controllerAPI, MatchViewModel viewModel)
@@ -75,6 +76,7 @@ MatchView *MatchView_new(IGameController* controllerAPI, MatchViewModel viewMode
     
     private_configureCallbacks(created);
 
+    
     return created;
 }
 void MatchView_destroy(MatchView *self)

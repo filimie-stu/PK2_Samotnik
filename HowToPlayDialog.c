@@ -15,6 +15,7 @@ HowToPlayDialog* HowToPlayDialog_newFromFile(const char* relativeFilename, GtkWi
     GtkBuilder *builder = gtk_builder_new_from_file("view/how_to_play_view.glade");
     created->dialog = GTK_WIDGET(gtk_builder_get_object(builder, "howToPlayDialog"));
     gtk_window_set_transient_for(GTK_WINDOW(created->dialog), parentWindow);
+    
 
     return created;
 }

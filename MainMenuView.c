@@ -106,6 +106,7 @@ void private_configureCallbacks(MainMenuView *self)
     g_signal_connect_swapped(self->continueBtn, "clicked", G_CALLBACK(private_continueMatch), self->controllerAPI);
     g_signal_connect_swapped(self->howToPlayBtn, "clicked", G_CALLBACK(private_howToPlay), self);
     g_signal_connect_swapped(self->newGameBtn, "clicked", G_CALLBACK(private_newGame), self);
+    g_signal_connect(self->window, "delete-event", gtk_main_quit, NULL);
 }
 
 void private_loadCssFromFile(const char *relativeFilename)
@@ -134,7 +135,7 @@ void private_newGame(MainMenuView *self, GtkButton *button)
             StartupSettingsDialog_getHandicap(self->startupSettings)};
         IGameController_beginMatch(self->controllerAPI, args);
     }
-    else if (dialogResponse == GTK_RESPONSE_CANCEL)
+    else if (dialogResponse == GTK_RESPONSE_CANCEL || dialogResponse == GTK_RESPONSE_DELETE_EVENT)
     {
         gtk_widget_hide(StartupSettingsDialog_getDialog(self->startupSettings));
     }
