@@ -59,7 +59,7 @@ int Score_getPoints(Score* self)
 }
 int Score_getGoal(Score* self)
 {
-    return self->goal;
+    return self->goal - self->handicap;
 }
 
 int Score_hasWon(Score* self)
