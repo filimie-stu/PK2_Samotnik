@@ -172,7 +172,7 @@ ViewFieldType private_determineFieldType(BoardView *self, Vector2D fieldCoords)
         return VIEW_JUMP_SPOT;
     else if (strncmp(label, " ", strlen(label)) == 0)
         return VIEW_EMPTY;
-    else if (strncmp(label, "o", strlen(label)) == 0)
+    else if (strncmp(label, "o", strlen(label)) == 0 || strncmp(label, "O", strlen(label)) == 0)
         return VIEW_TOKEN;
     else
         assert(0 && "We should never get in here.\n");

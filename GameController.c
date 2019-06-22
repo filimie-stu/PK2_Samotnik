@@ -119,9 +119,10 @@ void GameController_beginMatch(GameController *self, NewGameArgs settings)
     {
         IBoard_destroy(self->board, 1);
         IScore_destroy(self->score, 1);
+        IJumpHistory_destroy(self->jumpHistory, 1);
     }
-    self->board = IModelFactory_createBoard(self->modelFactory, settings.boardFilename);
-    self->score = IModelFactory_createScore(self->modelFactory, IBoard_countTokens(self->board) - 1, settings.handicap);
+    self->board = IModelFactory_createBoard(self->modelFactory, self->lastUsedSettings.boardFilename);
+    self->score = IModelFactory_createScore(self->modelFactory, IBoard_countTokens(self->board) - 1, self->lastUsedSettings.handicap);
     self->jumpHistory = IModelFactory_createJumpHistory(self->modelFactory);
 
     MatchViewModel viewModel = {private_boardToViewModel(self->board), private_scoreToViewModel(self->score)};
@@ -130,6 +131,24 @@ void GameController_beginMatch(GameController *self, NewGameArgs settings)
         GameController_asIGameController(self),
         viewModel);
     IView_display(self->matchView);
+    
+    if (IScore_hasWon(self->score))
+    {
+            self->gameOverView = IViewFactory_createGameOverView(
+                self->viewFactory,
+                GameController_asIGameController(self),
+                private_getWonViewModel());
+            IView_display(self->gameOverView);
+    }
+    else if (IBoard_isDeadEnd(self->board))
+    {
+        self->gameOverView = IViewFactory_createGameOverView(
+                self->viewFactory,
+                GameController_asIGameController(self),
+                private_getLostViewModel());
+            IView_display(self->gameOverView);
+    }
+
 }
 void GameController_rollback(GameController *self)
 {
@@ -144,6 +163,7 @@ void GameController_prepareForExit(GameController *self)
 {
     //...
 }
+
 void GameController_restartGame(GameController *self)
 {
     if (self->gameOverView)
@@ -156,7 +176,7 @@ void GameController_restartGame(GameController *self)
     self->board = IModelFactory_createBoard(self->modelFactory, self->lastUsedSettings.boardFilename);
 
     IScore_destroy(self->score, 1);
-    self->score = IModelFactory_createScore(self->modelFactory, IBoard_countTokens(self->board), self->lastUsedSettings.handicap);
+    self->score = IModelFactory_createScore(self->modelFactory, IBoard_countTokens(self->board)-1, self->lastUsedSettings.handicap);
 
     IJumpHistory_destroy(self->jumpHistory, 1);
     self->jumpHistory = IModelFactory_createJumpHistory(self->modelFactory);
@@ -171,6 +191,23 @@ void GameController_restartGame(GameController *self)
         viewModel);
 
     IView_display(self->matchView);
+
+    if (IScore_hasWon(self->score))
+    {
+            self->gameOverView = IViewFactory_createGameOverView(
+                self->viewFactory,
+                GameController_asIGameController(self),
+                private_getWonViewModel());
+            IView_display(self->gameOverView);
+    }
+    else if (IBoard_isDeadEnd(self->board))
+    {
+        self->gameOverView = IViewFactory_createGameOverView(
+                self->viewFactory,
+                GameController_asIGameController(self),
+                private_getLostViewModel());
+        IView_display(self->gameOverView);
+    }
 }
 
 void GameController_continueMatch(GameController *self)

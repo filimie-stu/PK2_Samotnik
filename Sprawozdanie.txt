@@ -170,3 +170,32 @@ Ogólne (z komentarzem):
     3. "Warning: Specified observer not found, thus cannot be removed. " - Usuwanie obserwatora nie powiodło się, gdyż nie został on odnaleziony w docelowej tablicy.
     4. "Warning: Maximum number of observers, cannot add another one. " - Dodawania obserwatora nie powiodło się, gdyż przeznaczona na nie tablica została juz wypełniona.        
 
+
+6. TESTY
+
+Częścią programu najbardziej wrażliwą na czynniki zewnętrzne, a więc bezwzględnie wymagającą testowania jest format pliku wejściowego.
+W folderze 'tests' drzewa projektu znajdują się wzory plansz, dla których aplikacja została pomyślnie przetestowana.
+Pełna lista nazw wyżej wymienionych plików zaprezentowana jest także poniżej:
+
+1. dimension_overvalued.board
+2. dimension_undervalued.board
+3. invalid_dimensions.board
+4. lacking_dimension.board
+5. no_dimensions.board
+6. empty_board.board
+7. instant_lose.board
+8. one_token.board
+9. unrecognized_char.board
+
+Zamieszczony został tam także plik o nazwie "win_test.board" umożliwiający osiągnięcie zwycięstwa w pojedynczym ruchu.
+
+7. WNIOSKI
+
+W ocenie autora, proces twórczy projektu znacząco pogłębił jego wiedzę o języku C, lecz nie była to jedyna korzyść zeń płynąca.
+Wykorzystanie biblioteki GTK+ do stworzenia interfejsu użytkownika oraz sam projekt architektury aplikacji pozwoliłu mu zdobyć
+podstawowe doświadczenie w zakresie tworzenia aplikacji okienkowych, a także odświeżyć znajomość pewnych programistyczych koncepcji,
+takich jak wzorzec "Obserwator" czy system sygnałów.
+Największym wyzwaniem okazała się własnoręczna implementacja charakterystycznych dla programowania obiektowego rozwiązań, 
+takich jak dziedziczenie (metody wirtualne) czy prywatne zmienne członkowskie.
+
+

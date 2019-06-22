@@ -148,17 +148,20 @@ Board *Board_newFromFile(const char *relativePath)
     if (fopen_s(&file, relativePath, "r") != 0)
     {
         perror("Failed to open specified board file. \n");
-        return NULL;
+        exit(1);
+        // return NULL;
     }
     if (private_loadDimensions(created, file) != 0)
     {
         perror("Failed to parse board dimensions. \n");
-        return NULL;
+        exit(1);
+        // return NULL;
     }
     if (private_loadFields(created, file) != 0)
     {
         perror("An error occurred while creating game board.\n");
-        return NULL;
+        exit(1);
+        // return NULL;
     }
 
     fclose(file);
@@ -265,19 +268,29 @@ int private_loadFields(Board *incompleteSelf, FILE *sourceFile)
     for (int i = 0; i < rows; i++)
         incompleteSelf->fields[i] = (Field *)malloc(sizeof(Field) * cols);
 
-    for (int i = 0; i < rows; i++)
+    int i = 0;
+    char* row = (char*)calloc(cols + 1, 1);
+    for (; i < rows; i++)
     {
+        row[cols-1] = '\0';
+        row[cols] = '\0';
+        fscanf(sourceFile, "%s ", row);
+        if (row[cols] != '\0' || row[cols-1] == '\0')
+            return 1;
+
         for (int j = 0; j < cols; j++)
         {
-            char c;
-            if (fscanf(sourceFile, "%c ", &c) != 1)
-                return 1;
-
-            incompleteSelf->fields[i][j] = Field_create(i, j, FieldType_fromChar(c));
+            incompleteSelf->fields[i][j] = Field_create(i, j, FieldType_fromChar(row[j]));
             if (incompleteSelf->fields[i][j].contents == REGULAR_TOKEN || incompleteSelf->fields[i][j].contents == ACTIVE_TOKEN)
-                incompleteSelf->tokenCount++;
+                incompleteSelf->tokenCount++;                
         }
     }
+    free(row);
+
+    if (i != rows)
+        return 1;
+    if (incompleteSelf->tokenCount < 1)
+        return 1;
     return 0;
 }
 Field *private_fieldAt(Board *self, Vector2D at)
