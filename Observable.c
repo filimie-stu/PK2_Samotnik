@@ -23,7 +23,7 @@ void Observable_addObserver(Observable *self, Observer *o)
 
     if (self->observersCount >= MAX_OBSERVERS)
     {
-        perror("Maximum number of observers, cannot add another one. Aborting...\n");
+        perror("Warning: Maximum number of observers, cannot add another one. Aborting...\n");
         return;
     }
 
@@ -38,7 +38,7 @@ void Observable_removeObserver(Observable *self, Observer *o)
 
     if (self->observersCount <= 0)
     {
-        perror("Specified observer not found, thus cannot be removed. Aborting...\n");
+        perror("Warning: Specified observer not found, thus cannot be removed. Aborting...\n");
         return;
     }
 

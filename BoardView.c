@@ -22,7 +22,6 @@ typedef struct board_view
 typedef enum view_field_type
 {
     VIEW_TOKEN,
-    VIEW_ACTIVE_TOKEN,
     VIEW_EMPTY,
     VIEW_JUMP_SPOT
 
@@ -60,6 +59,10 @@ BoardView *BoardView_new(IGameController *controllerAPI, BoardViewModel board, G
     created->parent = parent;
     created->observer = Observer_new(created, private_recieveSignal, board.boardObservable);
     private_loadModel(created, board);
+
+    created->activeField = Vector2D_create(-1,-1);
+    for (int i = 0; i < 4; i++)
+        created->jumpSpots[i] = Vector2D_create(-1,-1);
 
     return created;
 }
@@ -167,12 +170,10 @@ ViewFieldType private_determineFieldType(BoardView *self, Vector2D fieldCoords)
 
     if (private_isJumpSpot(self, field))
         return VIEW_JUMP_SPOT;
-    else if (strncmp(label, "_", strlen(label)) == 0)
+    else if (strncmp(label, " ", strlen(label)) == 0)
         return VIEW_EMPTY;
     else if (strncmp(label, "o", strlen(label)) == 0)
         return VIEW_TOKEN;
-    else if (strncmp(label, "O", strlen(label)) == 0)
-        return VIEW_ACTIVE_TOKEN;
     else
         assert(0 && "We should never get in here.\n");
 }
@@ -202,8 +203,8 @@ void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
     {
         BoardView *self = (BoardView *)vSelf;
         JumpInfo args = *(JumpInfo *)signalArgs;
-        private_updateAt(self, args.from, "_");
-        private_updateAt(self, args.through, "_");
+        private_updateAt(self, args.from, " ");
+        private_updateAt(self, args.through, " ");
         private_updateAt(self, args.to, "o");
         private_resetJumpSpots(self);
         private_resetActiveField(self);
@@ -215,7 +216,7 @@ void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
 
         private_updateAt(self, args.from, "o");
         private_updateAt(self, args.through, "o");
-        private_updateAt(self, args.to, "_");
+        private_updateAt(self, args.to, " ");
         private_resetJumpSpots(self);
 
         if (private_fieldAt(self, self->activeField))
@@ -243,7 +244,6 @@ void private_boardClicked(GtkButton *button, gpointer data)
         break;
 
     case VIEW_EMPTY:
-    case VIEW_ACTIVE_TOKEN:
         break;
 
     default:
@@ -261,11 +261,10 @@ void private_loadModel(BoardView *self, BoardViewModel model)
         for (int j = 0; j < model.dimensions.x; j++)
         {
             if (FieldType_toChar(model.fields[i][j]) != 'o' &&
-                FieldType_toChar(model.fields[i][j]) != '_')
+                FieldType_toChar(model.fields[i][j]) != ' ')
                 continue;
 
-            gchar label[2] = {FieldType_toChar(model.fields[i][j]), '\0'};
-            private_attachNewGridField(self, j, i, label);
+            private_attachNewGridField(self, j, i, FieldType_toString(model.fields[i][j]));
             private_configureBoardClickCallback(self, i, j);
         }
     }

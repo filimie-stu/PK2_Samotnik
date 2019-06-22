@@ -147,12 +147,12 @@ Board *Board_newFromFile(const char *relativePath)
     FILE *file;
     if (fopen_s(&file, relativePath, "r") != 0)
     {
-        perror("Failed to open specified file. Aborting...\n");
+        perror("Failed to open specified board file. \n");
         return NULL;
     }
     if (private_loadDimensions(created, file) != 0)
     {
-        perror("Failed to read board dimensions. Aborting...\n");
+        perror("Failed to parse board dimensions. \n");
         return NULL;
     }
     if (private_loadFields(created, file) != 0)
@@ -251,6 +251,8 @@ void private_applyJump(Board *self, JumpInfo jump)
 int private_loadDimensions(Board *incompleteSelf, FILE *sourceFile)
 {
     if (fscanf(sourceFile, "%d %d ", &incompleteSelf->dimensions.y, &incompleteSelf->dimensions.x) < 2)
+        return 1;
+    if (incompleteSelf->dimensions.y < 5 || incompleteSelf->dimensions.x < 5)
         return 1;
     return 0;
 }

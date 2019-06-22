@@ -20,3 +20,4 @@ typedef enum fieldType
 
 FieldType FieldType_fromChar(char c);
 char FieldType_toChar(FieldType ft);
+const char* FieldType_toString(FieldType ft);

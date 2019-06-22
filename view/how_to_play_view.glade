@@ -6,7 +6,7 @@
         <property name="resizable">False</property>
         <property name="modal">True</property>
         <property name="window_position">center-on-parent</property>
-        <property name="default_width">600</property>
+        <property name="default_width">730</property>
         <property name="default_height">400</property>
         <property name="destroy_with_parent">True</property>
         <property name="type_hint">dialog</property>
@@ -28,22 +28,52 @@
                 </child>
                 <child>
                     <object class="GtkGrid">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
                         <child>
                             <object class="GtkFrame">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="margin-top">15</property>
-                                <property name="margin-bottom">15</property>
-                                <property name="margin-start">15</property>
-                                <property name="margin-end">15</property>
+                                <property name="margin-top">5</property>
+                                <property name="margin-bottom">5</property>
+                                <property name="margin-start">5</property>
+                                <property name="margin-end">5</property>
+                                <property name="width-request">350</property>
                                 <child>
-                                    <object class="GtkImage" id="stepOneImg">
+                                    <object class="GtkBox">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="stock">gtk-missing-image</property>
+                                        <property name="orientation">vertical</property>
+                                        <property name="margin-top">15</property>
+                                        <property name="margin-bottom">15</property>
+                                        <property name="margin-start">15</property>
+                                        <property name="margin-end">15</property>
+                                        <child>
+                                            <object class="GtkLabel">
+                                                <property name="label">1. Find a token to perform a jump with.</property>
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="margin-top">10</property>
+                                            </object>
+                                            <packing>
+                                                <property name="position">1</property>
+                                            </packing>
+                                        </child>
+                                        <child>
+                                            <object class="GtkImage" id="stepOneImg">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="pixbuf">../assets/step1.png</property>
+                                            </object>
+                                            <packing>
+                                                <property name="position">0</property>
+                                            </packing>
+                                        </child>
                                     </object>
+
                                 </child>
                             </object>
+
                             <packing>
                                 <property name="left-attach">0</property>
                                 <property name="top-attach">0</property>
@@ -53,16 +83,44 @@
                             <object class="GtkFrame">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-
-                                <property name="margin-top">15</property>
-                                <property name="margin-bottom">15</property>
-                                <property name="margin-start">15</property>
-                                <property name="margin-end">15</property>
+                                <property name="margin-top">5</property>
+                                <property name="margin-bottom">5</property>
+                                <property name="margin-start">5</property>
+                                <property name="margin-end">5</property>
+                                <property name="width-request">350</property>
                                 <child>
-                                    <object class="GtkImage" id="stepTwoImg">
+
+                                    <object class="GtkBox">
+
+
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="stock">gtk-missing-image</property>
+                                        <property name="orientation">vertical</property>
+                                        <property name="margin-top">15</property>
+                                        <property name="margin-bottom">15</property>
+                                        <property name="margin-start">15</property>
+                                        <property name="margin-end">15</property>
+                                        <child>
+                                            <object class="GtkLabel">
+                                                <property name="label">2. Select the token by clicking on it.</property>
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="margin-top">10</property>
+                                            </object>
+                                            <packing>
+                                                <property name="position">1</property>
+                                            </packing>
+                                        </child>
+                                        <child>
+                                            <object class="GtkImage" id="stepTwoImg">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="pixbuf">../assets/step2.png</property>
+                                            </object>
+                                            <packing>
+                                                <property name="position">0</property>
+                                            </packing>
+                                        </child>
                                     </object>
                                 </child>
                             </object>
@@ -75,16 +133,42 @@
                             <object class="GtkFrame">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-
-                                <property name="margin-top">15</property>
-                                <property name="margin-bottom">15</property>
-                                <property name="margin-start">15</property>
-                                <property name="margin-end">15</property>
+                                <property name="margin-top">5</property>
+                                <property name="margin-bottom">5</property>
+                                <property name="margin-start">5</property>
+                                <property name="margin-end">5</property>
+                                <property name="width-request">350</property>
                                 <child>
-                                    <object class="GtkImage" id="stepThreeImg">
+
+                                    <object class="GtkBox">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="stock">gtk-missing-image</property>
+                                        <property name="orientation">vertical</property>
+                                        <property name="margin-top">15</property>
+                                        <property name="margin-bottom">15</property>
+                                        <property name="margin-start">15</property>
+                                        <property name="margin-end">15</property>
+                                        <child>
+                                            <object class="GtkLabel">
+                                                <property name="label">3. Jump over one of its neighbours.</property>
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="margin-top">10</property>
+                                            </object>
+                                            <packing>
+                                                <property name="position">1</property>
+                                            </packing>
+                                        </child>
+                                        <child>
+                                            <object class="GtkImage" id="stepThreeImg">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="pixbuf">../assets/step3.png</property>
+                                            </object>
+                                            <packing>
+                                                <property name="position">0</property>
+                                            </packing>
+                                        </child>
                                     </object>
                                 </child>
                             </object>
@@ -97,16 +181,43 @@
                             <object class="GtkFrame">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-
-                                <property name="margin-top">15</property>
-                                <property name="margin-bottom">15</property>
-                                <property name="margin-start">15</property>
-                                <property name="margin-end">15</property>
+                                <property name="margin-top">5</property>
+                                <property name="margin-bottom">5</property>
+                                <property name="margin-start">5</property>
+                                <property name="margin-end">5</property>
+                                <property name="width-request">350</property>
                                 <child>
-                                    <object class="GtkImage" id="stepFourImg">
+
+                                    <object class="GtkBox">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="stock">gtk-missing-image</property>
+                                        <property name="orientation">vertical</property>
+                                        <property name="margin-top">15</property>
+                                        <property name="margin-bottom">15</property>
+                                        <property name="margin-start">15</property>
+                                        <property name="margin-end">15</property>
+                                        <child>
+                                            <object class="GtkLabel">
+                                                <property name="label">4. Continue until there's only one token left.
+                                                </property>
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="margin-top">10</property>
+                                            </object>
+                                            <packing>
+                                                <property name="position">1</property>
+                                            </packing>
+                                        </child>
+                                        <child>
+                                            <object class="GtkImage" id="stepFourImg">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="pixbuf">../assets/step4.png</property>
+                                            </object>
+                                            <packing>
+                                                <property name="position">0</property>
+                                            </packing>
+                                        </child>
                                     </object>
                                 </child>
                             </object>

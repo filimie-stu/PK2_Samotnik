@@ -13,7 +13,8 @@ int main (int argc, char* argv[])
     GtkViewFactory* viewFactory= GtkViewFactory_new();
     GameController* controller = GameController_new( 
         ModelFactory_asIModelFactory(modelFactory),
-        GtkViewFactory_asIViewFactory(viewFactory));
+        GtkViewFactory_asIViewFactory(viewFactory)
+        );
 
     GameController_mainMenu(controller);
     gtk_main();

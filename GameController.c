@@ -121,7 +121,7 @@ void GameController_beginMatch(GameController *self, NewGameArgs settings)
         IScore_destroy(self->score, 1);
     }
     self->board = IModelFactory_createBoard(self->modelFactory, settings.boardFilename);
-    self->score = IModelFactory_createScore(self->modelFactory, IBoard_countTokens(self->board), settings.handicap);
+    self->score = IModelFactory_createScore(self->modelFactory, IBoard_countTokens(self->board) - 1, settings.handicap);
     self->jumpHistory = IModelFactory_createJumpHistory(self->modelFactory);
 
     MatchViewModel viewModel = {private_boardToViewModel(self->board), private_scoreToViewModel(self->score)};
