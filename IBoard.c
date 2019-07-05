@@ -3,6 +3,11 @@
 #include "Common.h"
 #include <stdlib.h>
 #include <stdio.h>
+
+/**
+ * \brief Interfejs implementowany przez model planszy (Board).
+ * \sa board
+*/
 typedef struct i_board
 {
     void *implObject;

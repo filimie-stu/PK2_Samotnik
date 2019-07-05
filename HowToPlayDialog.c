@@ -1,11 +1,13 @@
 #include "HowToPlayDialog.h"
 #include <stdlib.h>
 
-
+/**
+ * \brief Okno dialogowe zawierające instrukcję gry.
+*/
 typedef struct how_to_play_view
 {
     GameController* controllerAPI;
-    GtkWidget* dialog;
+    GtkWidget* dialog;                  //!< Wskaźnik na obiekt biblioteki GTK+ reprezentujący okno dialogowe.
 } HowToPlayDialog;
 
 HowToPlayDialog* HowToPlayDialog_newFromFile(const char* relativeFilename, GtkWindow *parentWindow)

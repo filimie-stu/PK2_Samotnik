@@ -2,15 +2,19 @@
 #include "SyncScoreArgs.h"
 #include <stdlib.h>
 #include "Observer.h"
+
+/**
+ * \brief Składowa część głównego widoku rozgrywki - subwidok wyniku.
+*/
 typedef struct score_view 
 {
-    Observer* scoreObserver;
-    IGameController* controllerAPI;
+    Observer* scoreObserver;            //!< obserwator modelu.
+    IGameController* controllerAPI;     //!< publiczny interfejs kontrolera gry
 
-    GtkContainer* parent;
-    GtkWidget* scoreFrame;
-    GtkWidget* takedownsCounter;
-    GtkWidget* tokensLeftCounter;
+    GtkContainer* parent;               //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący kontener zawierający ten subwidok. 
+    GtkWidget* scoreFrame;              //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący ramkę z wynikiem. 
+    GtkWidget* takedownsCounter;        //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący liczbę zbitych pionków. 
+    GtkWidget* tokensLeftCounter;       //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący liczbę pionków pozostałych do zbicia. 
 } ScoreView;
 
 

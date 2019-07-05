@@ -5,6 +5,13 @@
 #include <string.h>
 
 #define MAX_RECORDS 200
+
+/**
+ * \brief Klasa odpowiedzialna za zarządzanie historią ruchów wykonanych w trakcie meczu.
+ * 
+ *  Zasadniczą część funkcjonalności tej klasy stanowi zarządzanie stosem obiektów typu JumpInfo - posiada więc ona metody:
+ * "add" i "extract".
+*/
 typedef struct jump_history
 {
     IJumpHistory *iJumpHistory;

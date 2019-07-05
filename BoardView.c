@@ -3,19 +3,24 @@
 #include "BoardView.h"
 #include "Vector2D.h"
 #include "JumpInfo.h"
+#include "ViewFieldType.h"
 #include <stdlib.h>
 #include <gtk/gtk.h>
 
+/*!
+    \brief Składowa część głównego widoku rozgrywki - podwidok planszy.
+
+    Należy zwrócić uwagę na fakt, że BoardView nie implementuje IView, ponieważ nie jest on de facto pełnoprawnym widokiem.
+    BoardView odpowiada za efekty wizualne widoczne dla użytkownika w trakcie gry: podświetlanie i wygaszanie pól, wyświetlanie i usuwanie pionków, itp. 
+*/
 typedef struct board_view
 {
-    Observer *observer;
-
-    IGameController *controllerAPI;
-    GtkContainer *parent;
-    GtkWidget *boardGrid;
-
-    Vector2D activeField;
-    Vector2D jumpSpots[4];
+    Observer *observer;                 //!< obserwator modelu planszy
+    IGameController *controllerAPI;     //!< publiczny interfejs kontrolera gry
+    GtkContainer *parent;               //!< wskaźnik na kontener GTK zawierający planszę
+    GtkWidget *boardGrid;               //!< wskaźnik na element interfejsu użytkownika reprezentujący planszę
+    Vector2D activeField;               //!< współrzędne aktualnie aktywnego pola, w stanie domyślnym - wektor [-1,-1]
+    Vector2D jumpSpots[4];              //!< współrzędne pól możliwych do wybrania jako cel następnego skoku
 
 } BoardView;
 
@@ -27,11 +32,6 @@ typedef enum view_field_type
 
 } ViewFieldType;
 
-void BoardView_destroy(BoardView *self)
-{
-    Observer_destroy(self->observer);
-    free(self);
-}
 
 static void private_updateAt(BoardView *self, Vector2D at, const char *newLabel);
 static GtkWidget *private_fieldAt(BoardView *self, Vector2D at);
@@ -51,6 +51,11 @@ static void private_configureBoardClickCallback(BoardView *self, int row, int co
 static void private_boardClicked(GtkButton *button, gpointer data);
 static void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs);
 
+void BoardView_destroy(BoardView *self)
+{
+    Observer_destroy(self->observer);
+    free(self);
+}
 
 BoardView *BoardView_new(IGameController *controllerAPI, BoardViewModel board, GtkContainer *parent)
 {

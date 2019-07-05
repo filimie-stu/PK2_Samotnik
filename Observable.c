@@ -1,11 +1,20 @@
 #include "Observable.h"
 #define MAX_OBSERVERS 10
 
+/**
+ * \brief Klasa abstrakcyjna implementowana przez obiekty będące źródłami sygnałów.
+ * 
+ * Każdy obiekt, który z jakiegoś powodu oczekuje na sygnały wysyłane przez implementację 'Observable'
+ * powinien dziedziczyć po komplementarnej klasie 'Observer', której instancja może zostać dodana 
+ * do listy subskrybentów obiektu 'Observable'.  
+ * 
+ * \sa observer
+*/
 typedef struct observable
 {
-    Observer *observers[MAX_OBSERVERS];
-    int observersCount;
-    void *implementationObj;
+    Observer *observers[MAX_OBSERVERS];     //!< tablica obiektów obserwujących.
+    int observersCount;                     //!< liczba obiektów obserwujących
+    void *implementationObj;            
 } Observable;
 
 void Observable_notifyObservers(Observable *self, const char* signalID, void *signalArgs)

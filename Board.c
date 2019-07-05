@@ -9,14 +9,20 @@
 #include <math.h>
 #include <assert.h>
 
+/**
+    \brief Reprezentuje planszę do gry. Odpowiada za operacje na niej wykonywane, czyli m. in.: przesuwanie pionków, aktywację pól, cofanie ruchów.
+
+    Dokładnym zakresem odpowiedzialności klasy Board (poza udostępnianiem kilku akcesorów) 
+    są funkcjonalności związane z: przesuwaniem pionków (tryJump), aktywacją pól (tryActivate), cofanie skoków (rollbackJump),
+    oraz sprawdzanie czy gra nie utkwiła w martwym punkcie.
+*/
 typedef struct board 
 {
-    IBoard* iBoard;
-    Vector2D dimensions;
-    Field** fields;
-    Field* activeField;
-
-    int tokenCount;
+    IBoard* iBoard;         //!< implementacja interfejsu iBoard
+    Vector2D dimensions;    //!< wymiary plaszy
+    Field** fields;         //!< dynamicznie alokowana dwuwymiarowa tablica pól
+    Field* activeField;     //!< wskaźnik na aktualnie aktywne pole
+    int tokenCount;         //!< licznik pionków na planszy
 } Board;
 
 

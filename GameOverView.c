@@ -3,11 +3,17 @@
 #include "GameOverViewModel.h"
 #include <stdlib.h>
 #include "IView.h"
+
+/**
+ * \brief Widok powiadomienia o zakończeniu gry. 
+ * 
+ * Odpowiada za wyświetlanie okna z wiadomością o zwycięstwie bądź porażce.
+*/
 typedef struct game_over_view
 {
-    GtkWidget *window;
-    IGameController *controllerAPI;
-    IView *iView;
+    IView *iView;                       //!< implementacja interfejsu IView
+    GtkWidget *window;                  //!< wskaźnik na okno gry (nadrzędne względem okna powiadomienia)
+    IGameController *controllerAPI;     //!< publiczny interfejs kontrolera
 } GameOverView;
 
 static void private_wrapper_destroy(void *vSelf);

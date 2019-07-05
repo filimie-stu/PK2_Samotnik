@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/**
+ * \brief Fabryka modeli.
+*/
 typedef struct model_factory
 {
     IModelFactory *iModelFactory;

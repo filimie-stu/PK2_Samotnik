@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+/**
+ * \brief Interfejs implementowany przez fabrykę widoków GTK+ (GtkViewFactory).
+ * \sa gtk_view_factory
+*/
 typedef struct i_view_factory
 {
     void *implementationObject;

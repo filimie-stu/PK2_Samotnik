@@ -7,18 +7,21 @@
 #include <stdlib.h>
 #include <assert.h>
 
+/**
+ * \brief Widok głównego menu.
+*/
 typedef struct main_menu_view
 {
-    IView *iView;
-    GtkWidget *window;
-    GtkWidget *continueBtn;
-    int displayContinueBtn;
-    GtkWidget *newGameBtn;
-    GtkWidget *howToPlayBtn;
-    GtkWidget *exitBtn;
-    StartupSettingsDialog *startupSettings;
-    HowToPlayDialog *howToPlayDialog;
-    IGameController *controllerAPI;
+    IView *iView;                               //!< implementacja interfejsu IView .
+    GtkWidget *window;                          //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący główne okno programu.
+    GtkWidget *continueBtn;                     //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący przycisk kontynuacji gry. 
+    int displayContinueBtn;                     //!< flaga informująca o tym, czy przycisk kontynuacji powinien zostać wyświetlony
+    GtkWidget *newGameBtn;                      //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący przycisk rozpoczęcia nowej gry. 
+    GtkWidget *howToPlayBtn;                    //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący przycisk wyświetlający instrukcję. 
+    GtkWidget *exitBtn;                         //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący przycisk zakończenia pracy programu. 
+    StartupSettingsDialog *startupSettings;     //!< ustawienia wykorzystane ostatnim grazem do inicjalizacji sesji gry.
+    HowToPlayDialog *howToPlayDialog;           //!< wskaźnik na okno dialogowe zawierające instrukcję do gry.
+    IGameController *controllerAPI;             //!< publiczny interfejs kontrolera gry.
 } MainMenuView;
 
 static void private_exitProgram(IGameController *controller);

@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+/**
+ * \brief Interfejs implementowany przez wszystkie główne widoki.
+*/
 typedef struct i_view
 {
     void *implementationObject;

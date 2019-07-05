@@ -6,6 +6,7 @@
 #include "Observable.h"
 typedef struct i_board IBoard;
 
+/** \memberof i_board */
 IBoard* IBoard_new(
     void* implObject,
     void(*destroyOverride)(void*implObject),
@@ -19,12 +20,21 @@ IBoard* IBoard_new(
 
 );
 
+/** \memberof i_board */
 int IBoard_tryJump(IBoard* self, Vector2D from, Vector2D to, JumpInfo* out_jumpData );
+/** \memberof i_board */
 int IBoard_tryActivate(IBoard* self, Vector2D at);
+/** \memberof i_board */
 void IBoard_rollbackJump(IBoard* self, JumpInfo jumpData);
+/** \memberof i_board */
 FieldType IBoard_getFieldAt(IBoard* self, Vector2D at);
+/** \memberof i_board */
 Vector2D IBoard_getDimensions(IBoard* self);
+/** \memberof i_board */
 int IBoard_countTokens(IBoard* self);
+/** \memberof i_board */
 int IBoard_isDeadEnd(IBoard* self);
+/** \memberof i_board */
 Observable* IBoard_asObservable(IBoard* self);
+/** \memberof i_board */
 void IBoard_destroy(IBoard* self, int destroyDerivedTypes);

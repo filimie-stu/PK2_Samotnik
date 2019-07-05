@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+/**
+ * \brief Interfejs implementowany przez model wyniku (Score).
+ * \sa score
+*/
 typedef struct i_score
 {
     void *implementationObject;

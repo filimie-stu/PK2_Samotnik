@@ -8,22 +8,27 @@
 #include <stdlib.h>
 #include <string.h>
 
-
+/**
+ * \brief Główny widok gry.
+ * 
+ * Klasa ta odpowiada za wizualną prezentację rozgrywki. Składa sie z dwóch subwidoków: BoardView oraz ScoreView,
+ * których zakres odpowiedzialności skupia się wokół prezentacji odpowiednio: planszy oraz aktualnego wyniku.
+*/
 typedef struct match_view
 {
-    IView *iView;
-    IGameController *controllerAPI;
+    IView *iView;                       //!< implementacja interfejsu IView.
+    IGameController *controllerAPI;     //!< publiczny interfejs kontrolera gry
 
-    GtkWidget *window;
-    GtkWidget *mainMenuButton;
-    GtkWidget *resetButton;
-    GtkWidget *rollbackButton;
+    GtkWidget *window;                  //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący główne okno progamu. 
+    GtkWidget *mainMenuButton;          //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący przycisk przejścia do głównego menu. 
+    GtkWidget *resetButton;             //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący przycisk ponownego rozpoczęcia gry. 
+    GtkWidget *rollbackButton;          //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący przycisk cofnięcia ruchu. 
 
-    GtkContainer *boardAnchorPoint;
-    BoardView *boardView;
+    GtkContainer *boardAnchorPoint;     //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący miejsce "zaczepienia" subwidoku planszy.
+    BoardView *boardView;               //!< widok planszy.
 
-    GtkContainer *scoreAnchorPoint;
-    ScoreView *scoreView;
+    GtkContainer *scoreAnchorPoint;     //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący miejsce "zaczepienia" subwidoku wyniku.
+    ScoreView *scoreView;               //!< widok wyniku.
 
 
 } MatchView;

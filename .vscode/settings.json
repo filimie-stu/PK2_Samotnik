@@ -9,6 +9,7 @@
         "imodelfactory.h": "c",
         "stdio.h": "c",
         "jumphistory.h": "c",
-        "howtoplaydialog.h": "c"
+        "howtoplaydialog.h": "c",
+        "activatetokenargs.h": "c"
     }
 }

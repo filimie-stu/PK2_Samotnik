@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+/**
+ * \brief Interfejs implementowany przez fabrykę modeli (ModelFactory).
+ * \sa model_factory
+*/
 typedef struct i_model_factory
 {
     void *implementationObject;

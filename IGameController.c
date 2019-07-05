@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/**
+ * \brief Interfejs implementowany przez kontroler gry (GameController).
+ * \sa game_controller
+*/
 typedef struct i_game_controller
 {
     void *implementationObject;

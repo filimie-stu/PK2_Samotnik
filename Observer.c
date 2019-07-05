@@ -1,6 +1,14 @@
 #include "Observer.h"
 #include "Observable.h"
 
+
+/**
+ * \brief Klasa abstrakcyjna implementowana przez obiekty stanowiące obserwatorów, oczekujących na różnego typu sygnały.
+ * 
+ * Klasy, które mogą emitować sygnały winny dziedziczyć po komplementarnej klasie abstrakcyjnej 'Observable'.
+ * 
+ * \sa observable
+*/
 typedef struct observer
 {
     void *implementationObj;

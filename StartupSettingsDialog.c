@@ -1,11 +1,14 @@
 #include "StartupSettingsDialog.h"
 #include <stdlib.h>
 
+/**
+ * \brief Okno dialogowe pozwalające na konfigurację rozgrywki przed rozpoczęciem sesji.
+*/
 typedef struct startup_settings_dialog
 {
-    GtkWidget* dialog;
-    GtkWidget* filePickerBtn;
-    GtkWidget* handicapSpinnerBtn;
+    GtkWidget* dialog;                  //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący okno dialogowe. 
+    GtkWidget* filePickerBtn;           //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący przycisk wyboru pliku planszy. 
+    GtkWidget* handicapSpinnerBtn;      //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący przycisk wyboru liczby pionków pomocniczych. 
 
 } StartupSettingsDialog;
 

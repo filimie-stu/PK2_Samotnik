@@ -2,6 +2,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+
+/**
+ * \brief Interfejs implementowany przez model historii skoków (JumpHistory).
+ * \sa jump_history
+*/
 typedef struct i_jump_history
 {
     void *implementationObject;

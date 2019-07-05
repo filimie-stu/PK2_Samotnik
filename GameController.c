@@ -15,22 +15,31 @@
 #include <stdio.h>
 #include <string.h>
 
+/**
+ * \brief Kontroler gry - obsługuje żądania użytkownika, koordynuje pracę programu poprzez tworzenie modeli i widoków.
+ * 
+ * Pomimo iż kontroler zajmuje się tworzeniem modeli i widoków, nie jest od nich zależny - wykorzystuje do tego celu 
+ * instacje fabryk - odpowiednio: IModelFactory i IViewFactory, które otrzymuje jako argumenty konstruktora.
+ * 
+ * Użytkownik komunikuje się z kontrolerem poprzez widoki - ich konstruktory otrzymują instancję kontrolera zrzutowaną
+ * na IGameController (a więc jego publiczny interfejs) jako argumenty konstruktorów.
+*/
 typedef struct game_controller
 {
-    IGameController *iGameController;
+    IGameController *iGameController;   //!< implementacja interfejsu IGameController.
 
-    IModelFactory *modelFactory;
-    IViewFactory *viewFactory;
+    IModelFactory *modelFactory;        //!< instancja fabryki modeli.
+    IViewFactory *viewFactory;          //!< instancja fabryki widoków.
 
-    IBoard *board;
-    IScore *score;
-    IJumpHistory *jumpHistory;
+    IBoard *board;                      //!< model aktualnie reprezentujący planszę.
+    IScore *score;                      //!< model aktualnie reprezentujący wynik.
+    IJumpHistory *jumpHistory;          //!< model aktualnie reprezentujący historie ruchów.
 
-    IView *matchView;
-    IView *mainMenuView;
-    IView *gameOverView;
+    IView *matchView;                   //!< widok rozgrywki.
+    IView *mainMenuView;                //!< widok głównego menu.
+    IView *gameOverView;                //!< widok powiadomienia o zakończeniu gry.
 
-    NewGameArgs lastUsedSettings;
+    NewGameArgs lastUsedSettings;       //!< zbiór ustawień wykorzystanych przy ostatnim rozpoczynaniu rozgrywki - na jego podstawie odtworzony jest stan gry podczas wywołania funkcji _restartGame
 
 } GameController;
 

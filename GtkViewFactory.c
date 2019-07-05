@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+/**
+ * \brief Fabryka widoków opartych o bibliotekę GTK+.
+*/
 typedef struct gtk_view_factory
 {
     IViewFactory *iViewFactory;
