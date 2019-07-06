@@ -6,7 +6,6 @@
 */
 typedef struct how_to_play_view
 {
-    GameController* controllerAPI;
     GtkWidget* dialog;                  //!< Wskaźnik na obiekt biblioteki GTK+ reprezentujący okno dialogowe.
 } HowToPlayDialog;
 
