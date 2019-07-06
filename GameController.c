@@ -46,7 +46,7 @@ typedef struct game_controller
 void GameController_destroy(GameController *self)
 {
     assert(self->gameOverView == NULL);
-    
+
     GameController_prepareForExit(self);
     IGameController_destroy(self->iGameController, 0);
     free(self);
@@ -88,13 +88,13 @@ GameController *GameController_new(IModelFactory *modelFactory, IViewFactory *vi
 
 void GameController_endMatch(GameController *self)
 {
-    IView_destroy(self->gameOverView, 1);
-    self->gameOverView = NULL;
-    IBoard_destroy(self->board, 1);
-    self->board = NULL;
-    IView_destroy(self->matchView, 1);
-    self->matchView = NULL;
-    GameController_mainMenu(self);
+    // IView_destroy(self->gameOverView, 1);
+    // self->gameOverView = NULL;
+    // IBoard_destroy(self->board, 1);
+    // self->board = NULL;
+    // IView_destroy(self->matchView, 1);
+    // self->matchView = NULL;
+    // GameController_mainMenu(self);
 }
 
 void GameController_beginMatch(GameController *self, NewGameArgs settings)
@@ -109,12 +109,15 @@ void GameController_beginMatch(GameController *self, NewGameArgs settings)
         IBoard_destroy(self->board, 1);
         IScore_destroy(self->score, 1);
         IJumpHistory_destroy(self->jumpHistory, 1);
+        IView_destroy(self->matchView, 1);
     }
     self->board = IModelFactory_createBoard(self->modelFactory, self->lastUsedSettings.boardFilename);
     self->score = IModelFactory_createScore(self->modelFactory, IBoard_countTokens(self->board) - 1, self->lastUsedSettings.handicap);
     self->jumpHistory = IModelFactory_createJumpHistory(self->modelFactory);
 
-    MatchViewModel viewModel = {private_boardToViewModel(self->board), private_scoreToViewModel(self->score)};
+    MatchViewModel viewModel = {
+        private_boardToViewModel(self->board), 
+        private_scoreToViewModel(self->score)};
     self->matchView = IViewFactory_createMatchView(
         self->viewFactory,
         GameController_asIGameController(self),
@@ -184,43 +187,44 @@ void GameController_restartGame(GameController *self)
         IView_destroy(self->gameOverView, 1);
         self->gameOverView = NULL;
     }
+    
+    GameController_beginMatch(self, self->lastUsedSettings);
+    // IBoard_destroy(self->board, 1);
+    // self->board = IModelFactory_createBoard(self->modelFactory, self->lastUsedSettings.boardFilename);
 
-    IBoard_destroy(self->board, 1);
-    self->board = IModelFactory_createBoard(self->modelFactory, self->lastUsedSettings.boardFilename);
+    // IScore_destroy(self->score, 1);
+    // self->score = IModelFactory_createScore(self->modelFactory, IBoard_countTokens(self->board)-1, self->lastUsedSettings.handicap);
 
-    IScore_destroy(self->score, 1);
-    self->score = IModelFactory_createScore(self->modelFactory, IBoard_countTokens(self->board)-1, self->lastUsedSettings.handicap);
+    // IJumpHistory_destroy(self->jumpHistory, 1);
+    // self->jumpHistory = IModelFactory_createJumpHistory(self->modelFactory);
 
-    IJumpHistory_destroy(self->jumpHistory, 1);
-    self->jumpHistory = IModelFactory_createJumpHistory(self->modelFactory);
+    // IView_destroy(self->matchView, 1);
+    // MatchViewModel viewModel = {private_boardToViewModel(self->board),
+    //                             private_scoreToViewModel(self->score)};
 
-    IView_destroy(self->matchView, 1);
-    MatchViewModel viewModel = {private_boardToViewModel(self->board),
-                                private_scoreToViewModel(self->score)};
+    // self->matchView = IViewFactory_createMatchView(
+    //     self->viewFactory,
+    //     GameController_asIGameController(self),
+    //     viewModel);
 
-    self->matchView = IViewFactory_createMatchView(
-        self->viewFactory,
-        GameController_asIGameController(self),
-        viewModel);
+    // IView_display(self->matchView);
 
-    IView_display(self->matchView);
-
-    if (IScore_hasWon(self->score))
-    {
-            self->gameOverView = IViewFactory_createGameOverView(
-                self->viewFactory,
-                GameController_asIGameController(self),
-                private_getWonViewModel());
-            IView_display(self->gameOverView);
-    }
-    else if (IBoard_isDeadEnd(self->board))
-    {
-        self->gameOverView = IViewFactory_createGameOverView(
-                self->viewFactory,
-                GameController_asIGameController(self),
-                private_getLostViewModel());
-        IView_display(self->gameOverView);
-    }
+    // if (IScore_hasWon(self->score))
+    // {
+    //         self->gameOverView = IViewFactory_createGameOverView(
+    //             self->viewFactory,
+    //             GameController_asIGameController(self),
+    //             private_getWonViewModel());
+    //         IView_display(self->gameOverView);
+    // }
+    // else if (IBoard_isDeadEnd(self->board))
+    // {
+    //     self->gameOverView = IViewFactory_createGameOverView(
+    //             self->viewFactory,
+    //             GameController_asIGameController(self),
+    //             private_getLostViewModel());
+    //     IView_display(self->gameOverView);
+    // }
 }
 
 void GameController_continueMatch(GameController *self)
