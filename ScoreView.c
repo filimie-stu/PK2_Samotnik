@@ -42,11 +42,11 @@ void private_recieveSignal(void *vSelf, const char *signalID, void *signalArgs)
 void private_syncScore(ScoreView* self, SyncScoreArgs args)
 {
     char takedownsStr[3] = { '\0','\0','\0' };
-    sprintf_s(takedownsStr, sizeof(takedownsStr), "%d", args.takedowns);
+    sprintf(takedownsStr,"%d", args.takedowns);
     gtk_label_set_label(GTK_LABEL(self->takedownsCounter), takedownsStr);
     
     char leftStr[3] = { '\0','\0','\0' };
-    sprintf_s(leftStr, sizeof(leftStr), "%d", args.tokensLeft);
+    sprintf(leftStr, "%d", args.tokensLeft);
     gtk_label_set_label(GTK_LABEL(self->tokensLeftCounter), leftStr);
 }
 

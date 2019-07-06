@@ -3,7 +3,6 @@
 #include "BoardView.h"
 #include "Vector2D.h"
 #include "JumpInfo.h"
-#include "ViewFieldType.h"
 #include <stdlib.h>
 #include <gtk/gtk.h>
 

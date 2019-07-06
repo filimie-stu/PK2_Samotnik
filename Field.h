@@ -2,6 +2,7 @@
 #include "Vector2D.h"
 #include "Common.h"
 
+
 /**
  * \brief Struktura przechowująca współrzędne i typ pola.
 */

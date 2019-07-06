@@ -150,8 +150,8 @@ Board *Board_newFromFile(const char *relativePath)
     created->activeField = NULL;
     created->tokenCount = 0;
 
-    FILE *file;
-    if (fopen_s(&file, relativePath, "r") != 0)
+    FILE *file = fopen(relativePath, "r");
+    if (file == NULL)
     {
         perror("Failed to open specified board file. \n");
         exit(1);

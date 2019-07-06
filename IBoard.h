@@ -6,6 +6,7 @@
 #include "Observable.h"
 typedef struct i_board IBoard;
 
+
 /** \memberof i_board */
 IBoard* IBoard_new(
     void* implObject,

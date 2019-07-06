@@ -6,10 +6,20 @@
 #include "JumpInfo.h"
 #include "JumpHistory.h"
 
-typedef enum
+typedef enum click_result
 {
-    NO_ACTION, JUMP, ACTIVATE_TOKEN
+    NO_ACTION, 
+    JUMP,
+    ACTIVATE_TOKEN
 } ClickResult;
+
+typedef enum direction
+{
+    UP = 0,
+    DOWN = 1,
+    LEFT = 2,
+    RIGHT = 3
+} Direction;
 
 
 typedef struct board Board;

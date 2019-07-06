@@ -1,6 +1,7 @@
 #include "Common.h"
 #include <stdio.h>
 
+
 FieldType FieldType_fromChar(char c)
 {
     switch (c)
@@ -18,6 +19,7 @@ FieldType FieldType_fromChar(char c)
         return EMPTY;
     }
 }
+
 char FieldType_toChar(FieldType ft)
 {
     switch(ft)
@@ -35,6 +37,7 @@ char FieldType_toChar(FieldType ft)
             return '?';
     }
 }
+
 const char* FieldType_toString(FieldType ft)
 {
     switch(ft)
