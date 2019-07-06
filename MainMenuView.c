@@ -12,16 +12,16 @@
 */
 typedef struct main_menu_view
 {
-    IView *iView;                               //!< implementacja interfejsu IView .
-    GtkWidget *window;                          //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący główne okno programu.
-    GtkWidget *continueBtn;                     //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący przycisk kontynuacji gry. 
-    int displayContinueBtn;                     //!< flaga informująca o tym, czy przycisk kontynuacji powinien zostać wyświetlony
-    GtkWidget *newGameBtn;                      //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący przycisk rozpoczęcia nowej gry. 
-    GtkWidget *howToPlayBtn;                    //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący przycisk wyświetlający instrukcję. 
-    GtkWidget *exitBtn;                         //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący przycisk zakończenia pracy programu. 
-    StartupSettingsDialog *startupSettings;     //!< ustawienia wykorzystane ostatnim grazem do inicjalizacji sesji gry.
-    HowToPlayDialog *howToPlayDialog;           //!< wskaźnik na okno dialogowe zawierające instrukcję do gry.
-    IGameController *controllerAPI;             //!< publiczny interfejs kontrolera gry.
+    IView *iView;                           //!< implementacja interfejsu IView .
+    GtkWidget *window;                      //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący główne okno programu.
+    GtkWidget *continueBtn;                 //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący przycisk kontynuacji gry.
+    int displayContinueBtn;                 //!< flaga informująca o tym, czy przycisk kontynuacji powinien zostać wyświetlony
+    GtkWidget *newGameBtn;                  //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący przycisk rozpoczęcia nowej gry.
+    GtkWidget *howToPlayBtn;                //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący przycisk wyświetlający instrukcję.
+    GtkWidget *exitBtn;                     //!< wskaźnik na obiekt biblioteki GTK+ reprezentujący przycisk zakończenia pracy programu.
+    StartupSettingsDialog *startupSettings; //!< ustawienia wykorzystane ostatnim grazem do inicjalizacji sesji gry.
+    HowToPlayDialog *howToPlayDialog;       //!< wskaźnik na okno dialogowe zawierające instrukcję do gry.
+    IGameController *controllerAPI;         //!< publiczny interfejs kontrolera gry.
 } MainMenuView;
 
 static void private_exitProgram(IGameController *controller);
@@ -55,15 +55,16 @@ MainMenuView *MainMenuView_new(IGameController *controllerAPI, MainMenuViewModel
 
     return created;
 }
-IView* MainMenuView_asIView(MainMenuView* self)
+IView *MainMenuView_asIView(MainMenuView *self)
 {
     return self->iView;
 }
 void MainMenuView_destroy(MainMenuView *self)
 {
-    gtk_widget_destroy(self->window);
     StartupSettingsDialog_destroy(self->startupSettings);
     HowToPlayDialog_destroy(self->howToPlayDialog);
+    gtk_widget_destroy(self->window);
+    IView_destroy(self->iView, 0);
     free(self);
 }
 void MainMenuView_display(MainMenuView *self)
@@ -100,8 +101,8 @@ void private_loadMembersFromXML(MainMenuView *self, const char *relativeFilename
     self->newGameBtn = GTK_WIDGET(gtk_builder_get_object(builder, "newGameBtn"));
     self->howToPlayBtn = GTK_WIDGET(gtk_builder_get_object(builder, "howToPlayBtn"));
     self->continueBtn = GTK_WIDGET(gtk_builder_get_object(builder, "continueBtn"));
+
     g_object_unref(builder);
-        
 }
 
 void private_configureCallbacks(MainMenuView *self)
@@ -110,7 +111,7 @@ void private_configureCallbacks(MainMenuView *self)
     g_signal_connect_swapped(self->continueBtn, "clicked", G_CALLBACK(private_continueMatch), self->controllerAPI);
     g_signal_connect_swapped(self->howToPlayBtn, "clicked", G_CALLBACK(private_howToPlay), self);
     g_signal_connect_swapped(self->newGameBtn, "clicked", G_CALLBACK(private_newGame), self);
-    g_signal_connect(self->window, "delete-event", gtk_main_quit, NULL);
+    g_signal_connect_swapped(self->window, "delete-event", G_CALLBACK(private_exitProgram), self->controllerAPI);
 }
 
 void private_loadCssFromFile(const char *relativeFilename)

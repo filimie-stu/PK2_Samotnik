@@ -46,28 +46,8 @@ typedef struct game_controller
 void GameController_destroy(GameController *self)
 {
     assert(self->gameOverView == NULL);
-
-    if (self->matchView)
-    {
-        IView_destroy(self->matchView, 1);
-    }
-    if (self->mainMenuView)
-    {
-        IView_destroy(self->mainMenuView, 1);
-    }
-    if (self->board)
-    {
-        IBoard_destroy(self->board, 1);
-    }
-    if (self->score)
-    {
-        IScore_destroy(self->score, 1);
-    }
-    if (self->jumpHistory)
-    {
-        IJumpHistory_destroy(self->jumpHistory, 1);
-    }
-
+    
+    GameController_prepareForExit(self);
     IGameController_destroy(self->iGameController, 0);
     free(self);
 }
@@ -170,7 +150,31 @@ void GameController_rollback(GameController *self)
 
 void GameController_prepareForExit(GameController *self)
 {
-    //...
+    if (self->matchView)
+    {
+        IView_destroy(self->matchView, 1);
+        self->matchView = NULL;
+    }
+    if (self->mainMenuView)
+    {
+        IView_destroy(self->mainMenuView, 1);
+        self->mainMenuView = NULL;
+    }
+    if (self->board)
+    {
+        IBoard_destroy(self->board, 1);
+        self->board = NULL;
+    }
+    if (self->score)
+    {
+        IScore_destroy(self->score, 1);
+        self->score = NULL;
+    }
+    if (self->jumpHistory)
+    {
+        IJumpHistory_destroy(self->jumpHistory, 1);
+        self->jumpHistory = NULL;
+    }
 }
 
 void GameController_restartGame(GameController *self)
