@@ -68,7 +68,7 @@ GameOverView *GameOverView_new(IGameController *controllerAPI, GameOverViewModel
     GtkWidget* restartBtn = GTK_WIDGET(gtk_builder_get_object(builder,"restartBtn"));
     GtkWidget* mainMenuBtn = GTK_WIDGET(gtk_builder_get_object(builder,"mainMenuBtn"));
 
-
+    g_object_unref(builder);
     g_signal_connect_swapped(restartBtn, "clicked", G_CALLBACK(IGameController_restartGame), created->controllerAPI);
     g_signal_connect_swapped(mainMenuBtn, "clicked", G_CALLBACK(IGameController_endMatch), created->controllerAPI);
 

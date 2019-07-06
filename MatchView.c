@@ -53,6 +53,7 @@ void private_loadMembersFromXML(MatchView* self)
     self->rollbackButton = GTK_WIDGET(gtk_builder_get_object(builder, "rollbackBtn"));
     self->boardAnchorPoint = GTK_CONTAINER(gtk_builder_get_object(builder, "boardAnchorPoint"));
     self->scoreAnchorPoint = GTK_CONTAINER(gtk_builder_get_object(builder, "scoreAnchorPoint"));
+    g_object_unref(builder);
 
 }
 void private_configureCallbacks(MatchView* self)

@@ -65,6 +65,7 @@ void private_loadMembersFromXML(ScoreView* self)
     
     self->takedownsCounter = GTK_WIDGET(gtk_builder_get_object(builder, "takedownsCounter"));
     self->tokensLeftCounter = GTK_WIDGET(gtk_builder_get_object(builder, "tokensLeftCounter"));
+    g_object_unref(builder);
 }
 
 ScoreView* ScoreView_new(IGameController* controllerAPI, ScoreViewModel score, GtkContainer* parent)

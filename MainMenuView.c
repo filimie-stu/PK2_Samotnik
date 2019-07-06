@@ -100,6 +100,7 @@ void private_loadMembersFromXML(MainMenuView *self, const char *relativeFilename
     self->newGameBtn = GTK_WIDGET(gtk_builder_get_object(builder, "newGameBtn"));
     self->howToPlayBtn = GTK_WIDGET(gtk_builder_get_object(builder, "howToPlayBtn"));
     self->continueBtn = GTK_WIDGET(gtk_builder_get_object(builder, "continueBtn"));
+    g_object_unref(builder);
         
 }
 
