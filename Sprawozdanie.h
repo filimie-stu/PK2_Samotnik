@@ -11,22 +11,28 @@ pionka, najlepiej, jeśli będzie to pionek w centrum planszy.
 
 \section analiza_projektu Analiza projektu 
 
-Jako że postawionym przed autorem pracy problemem był projekt gry planszowej, 
+Jako że postawionym przed autorem problemem był projekt gry planszowej, 
 naturalnym rozwiązaniem zdało się podążanie za paradygmatem programowania obiektowego. 
 W związku z faktem, iż język C nie posiada wbudowanych mechanizmów wspierających programowanie
 obiektowe, zdecydowano się na ich samodzielną implementację. 
 
-Kolejnym, nie mniej istotnym od wyboru paradygmatu, krokiem na etapie projektowania był wybór architektury projektu.
+Kolejnym, nie mniej istotnym, krokiem na etapie projektowania był wybór architektury programu.
 W tym względzie zdecydowano się na tzw. MVC (ang. Model-View-Controller), konwencję polegajacą na podziale aplikacji 
 na trzy, możliwie niezależne, części, odpowiadające za odpowiednio: wewnętrzny stan programu (Model), warstwę prezentacji (View)
 oraz interakcję z użytkownikiem i koordynację pracy programu (Controller). 
 
 Ostatnią kluczową decyzją projektową był wybór biblioteki, umożliwiającej realizację warstw widoku i kontrolera. 
 Ostatecznie wybrana została biblioteka GTK+ w wersji 3, umożliwiająca konstrukcję interfejsu użytkownika na bazie
-plików XML.   
+plików XML. 
+
+https://www.gtk.org/
+
+Do generowania większości plików XML posłużono się programem Glade, zintegrowanym z biblioteką GTK+.
+
+https://glade.gnome.org/
 
 Poniżej zaprezentowano rozwiązania i konwencje stosowane w kodzie źródłowym, mające na celu
-jak najlepsze oddanie poszczególnych popularnych koncepcji obiektowych, a także pomocnych przy budowaniu
+jak najlepsze oddanie poszczególnych popularnych koncepcji obiektowych, a także pomocne przy budowaniu
 architektury MVC.
 
 
@@ -36,26 +42,28 @@ W języku C nie występuje koncepcja klasy, dobrze znana w językach wyższego p
 struktur, a więc obiektów grupujacych dane, lecz występująca w projekcie konieczność dynamicznego alokowania pamięci
 na niektóre z nich, obniżała czytelność i wprowadzała deorganizację kodu źródłowego. Celem ujednolicenia wykorzystywanych
 rozwiązań podjęto kilka istotnych kroków:
-    1. każda zdefiniowana struktura posiada alias, w postaci swojej oryginalnej nazwy, pozbawiony jednak członu 'struct'
+    - Każda zdefiniowana struktura posiada alias, w postaci swojej oryginalnej nazwy, pozbawiony jednak członu 'struct'
        oraz zapisany w notacji PascalCase;
-    2. struktury podzielono na reprezentujące klasy (a więc nie tylko posiadające stan, ale też enkapsulujące pewne zachowania), zawsze alokowane na stercie, nazywane dalej klasami - oraz na grupujące dane, alokowane na stosie.
-    3. każda klasa posiada zdefiniowane metody *new* oraz *destroy*, odpowiednio alokujące i dealokujące wykorzystywane przez
+    - Struktury podzielono na reprezentujące klasy (a więc nie tylko posiadające stan, ale też enkapsulujące pewne zachowania), zawsze alokowane dynamicznie, nazywane dalej klasami - oraz na grupujące dane, alokowane na stosie.
+    - Każda klasa posiada zdefiniowane metody *new* oraz *destroy*, odpowiednio alokujące i dealokujące wykorzystywane przez
        dany obiekt zasoby oraz pamięć;
-    4. Typy stanowiące prostą agregację danych musza posiadać jedynie metodę *create*, która, w odróżnieniu od *new*,             zwracającego wskaźnik na dynamicznie alokowaną pamięć, tworzy obiekt na stosie, zwracając jego kopię.
+    - Typy stanowiące prostą agregację danych musza posiadać jedynie metodę *create*, która, w odróżnieniu od *new*, zwracającego wskaźnik na dynamicznie alokowaną pamięć, tworzy obiekt na stosie, zwracając jego kopię.
 
 
 \subsection metody Metody
 
 Istotną częścią koncepcji klasy jest reprezentowanie charakterystycznych dla niej zachowań poprzez przyporządkowany jej zestaw
 funkcji nazywanych metodami. W wielu językach programowania (np. w C++, C#, Javie) składnia wywołania metody jest następująca:
-obiekt.metoda(argumenty).
+    
+    obiekt.metoda(argumenty).
+
 Osiągnięcie podobnej składni w C byłoby możliwe poprzez zdefiniowanie w obrębie klasy/struktury wskaźników na funkcje,
 których pierwszym argumentem wywołania byłby zawsze obiekt nań wskazujący, miałoby to jednak niekorzystny wpływ na czytelność kodu.
 
 Rozwiązanie wykorzystane w projekcie prezentuje się następująco:
-    1. Każdy plik nagłówkowy deklarujący klasę, deklaruje także zestaw funkcji prefiksowanych nazwą tejże klasy. 
-       W ogólności: NazwaKlasy_nazwaMetody;
-    2. Pierwszym argumentem tak zdefiniowanych funkcji jest zawsze wskaźnik na obiekt, którego zachowanie mają one reprezentować
+    - Każdy plik nagłówkowy deklarujący klasę, deklaruje także zestaw funkcji prefiksowanych nazwą tejże klasy. 
+       W przypadku ogólnym: NazwaKlasy_nazwaMetody;
+    - Pierwszym argumentem tak zdefiniowanych funkcji jest zawsze wskaźnik na obiekt, którego zachowanie mają one reprezentować
        (wyjątek stanowi metoda *new*, która ma za zadanie ten obiekt stworzyć), 
        np. nagłówki wspomnianych wyżej metod *new* oraz *destroy* dla klasy Board prezentują się następująco:
        Board_new(), Board_destroy(Board* self);
@@ -63,20 +71,20 @@ Rozwiązanie wykorzystane w projekcie prezentuje się następująco:
 \subsection pola_i_metody_prywatne Pola i metody prywatne
 
 Pola i metody prywatne służą obiektom do wykonywania wewnętrznych operacji, a więc o charakterze wrażliwym bądź nieistotnym
-z punktu widzenia użytkownika. Aby osiągnąc podobną funkcjonalność podjęto następujące kroki:
-    1. Pliki nagłówkowe, miast definiować, jedynie deklarują klasy - definicje zawarte są w komplementarnych plikach źródłowych.
+z punktu widzenia użytkownika. Aby osiągnąc podobną funkcjonalność poczyniono następujące kroki:
+    - Pliki nagłówkowe, miast definiować, jedynie deklarują klasy - definicje zawarte są w komplementarnych plikach źródłowych.
        Dzięki takiemu rozwiązaniu, pola klas, które powinny być dostępne z zewnątrz mogą zostać upublicznione przy pomocy
        tzw. akcesorów, czyli popularnych metod typu get i set. Reszta zmiennych członkowskich jest niewidoczna spoza pliku 
-       implementacyjnego, co w pewien sposóbo ogranicza dostęp do nich.
-    2. Metody niestanowiące publiczngo interfejsu klasy, zostały zarówno zadeklarowane jak i zdefiniowane w plikach .c,
+       implementacyjnego, co w pewien sposób ogranicza dostęp do nich.
+    - Metody niestanowiące publiczngo interfejsu klasy, zostały zarówno zadeklarowane jak i zdefiniowane w plikach .c,
        co prowadzi do sytuacji podobnej, jak w przypadku wyżej wymienionych "prywatnych" pól.
-       Co więcej, zostały one również zadeklarowane jako statyczne, co skutecznie ogranicza zasięg ich wywołań (scope) do
+       Co więcej, zostały one również zadeklarowane jako statyczne, co skutecznie ogranicza zasięg ich wywołań do
        natywnego pliku.
 
 \subsection interfejsy_dziedziczenie Interfejsy, dziedziczenie
 
 Interfejsy pozwalają na rozdzielenie abstrakcji od jej konkretnych, wrażliwych na zmiany i mało elastycznych, implementacji.
-Chcąc umożliwić korzystanie z interfejsów (a także miejscami - klas abstrakcyjnych), oprócz realizacji ich samych, koniecznym
+Chcąc umożliwić korzystanie z interfejsów (a także miejscami klas abstrakcyjnych), oprócz realizacji ich samych, koniecznym
 okazało się wprowadzenie mechanizmu dziedziczenia.
 Poniżej wymienione zostały kluczowe cechy zastosowanych w tym względzie rozwiązań:
     1. Jako że język C nie wspiera mechanizmu dziedziczenia, został on zaimplementowany w oparciu o kompozycję (zawieranie)
@@ -84,7 +92,9 @@ Poniżej wymienione zostały kluczowe cechy zastosowanych w tym względzie rozwi
     2. Naturalną konsekwencją powyższego rozwiązania jest fakt, iż interfejsy i klasy abstrakcyjne są w istocie reprezentowane
        przez zwykłe klasy (przerobione struktury) i ich instancje, referencje do których zawarte są w klasach dziedziczących.
     3. Każda klasa implementująca interfejs, powinna posiadać zdefiniowaną metodę o sygnaturze:
-       NazwaKlasy_asNazwaInterfejsu(...),
+       
+            NazwaKlasy_asNazwaInterfejsu(...) 
+       
        zwracającą wskaźnik instancję tegoż, celem umożliwienia rzutowania i polimorficznych wywołań metod.  
     4. Implementacja interfejsu przebiega w sposób następujący:
         - W konstruktorze klasy implementującej tworzona jest instancja interfejsu.
@@ -103,7 +113,7 @@ Poniżej wymienione zostały kluczowe cechy zastosowanych w tym względzie rozwi
 W przypadku standardowym, wszelka konfiguracja przeznaczona dla użytkownika dostępna jest w trakcie działania programu
 i ogranicza się do:
     1. Wyboru pliku, w którym zapisana jest plansza.
-    2. Wyboru do ilu dodatkowych żetonów pozostałych na planszy toczy się gra (a więc poziomu trudności).
+    2. Wyboru, do ilu pionków pozostałych (dodatkowo) na planszy toczy się gra (a więc poziomu trudności).
 
 \subsection rozszerzanie_funkcjonalnosci Rozszerzanie funkcjonalności
 
@@ -111,9 +121,9 @@ O ile cel gry przyjąć musi jedną z odgórnie ustalonych całkowitych wartośc
 Dopuszczalny format pliku wejściowego z planszą to: 
     1. Dwie liczby całkowite oddzielone znakiem białym: {liczba wierszy planszy} {liczba kolumn planszy}
     2. Zawartości pól planszy, przedstawione w postaci pojedynczych znaków ASCII o następującej konwencji kodowania:
-        2a) '#' - brak pola tudzież pole nieinteraktywne
-        2b) '_' - pole puste
-        2c) 'o' - pole z żetonem
+        - '#' - brak pola tudzież pole nieinteraktywne
+        - '_' - pole puste
+        - 'o' - pole z żetonem
 
 Przykładowa zawartość pliku planszy:
 
@@ -127,8 +137,7 @@ Przykładowa zawartość pliku planszy:
     ##ooo##
 
 
-Pliki planszy powinny być umieszczone w folderze "data" w strukturze projektu.
-
+Zaleca się umieszczanie plików planszy w folderze "data" w strukturze projektu.
 
 \subsection komunikaty_bledow Komunikaty błędów
 
@@ -201,18 +210,18 @@ Autor dołożył wszelkich starań, aby uniknąć wycieków pamięci podczas pra
 było to zadanie niełatwe.
 
 Po przetestowaniu programu pod tym kątem okazało się, iż ich występowanie jest wysoce prawdopodobne, jednakże jedną z przyczyn tego zjawiska 
-może być specyfika biblioteki GTK+. Wykorzystywanie zasobów zewnętrznych takich jak pliki .XML czy .css wydają się być
+może być specyfika biblioteki GTK+. Wykorzystywanie zasobów zewnętrznych takich jak pliki .XML czy .css wydaje się być
 przyczyną generowania fałszywych komunikatów o wyciekach pamięci przez program diagnostyczny (co tłumaczyłoby przynajmniej część występujących przypadków).       
-
+Niestety nie udało się stwierdzić jak duża część potencjalnych wycieków jest kwestią czynników zewnętrznych, a jak duża jest konsekwencją działań autora. 
 
 \section wnioski Wnioski
 
-W ocenie autora, proces twórczy projektu znacząco pogłębił jego wiedzę o języku C, lecz nie była to jedyna korzyść zeń płynąca.
-Wykorzystanie biblioteki GTK+ do stworzenia interfejsu użytkownika oraz sam projekt architektury aplikacji pozwoliłu mu zdobyć
+Proces twórczy projektu znacząco pogłębił wiedzę autora o języku C, lecz nie była to jedyna płynąca z niego korzyść.
+Wykorzystanie biblioteki GTK+ do stworzenia interfejsu użytkownika oraz sam projekt architektury aplikacji pozwoliły autorowi zdobyć
 podstawowe doświadczenie w zakresie tworzenia aplikacji okienkowych, a także odświeżyć znajomość pewnych programistyczych koncepcji,
 takich jak wzorzec "Obserwator" czy system sygnałów.
-Największym wyzwaniem okazała się własnoręczna implementacja charakterystycznych dla programowania obiektowego rozwiązań, 
-takich jak dziedziczenie (metody wirtualne) czy prywatne zmienne członkowskie.
-
+Największym wyzwaniem okazało się samodzielne zarządzanie wielokrotnie dynamicznie alokowaną pamięcią.
+Stosunkowo problematyczną była również własnoręczna implementacja charakterystycznych dla programowania obiektowego rozwiązań, 
+takich jak dziedziczenie, metody wirtualne czy prywatne zmienne członkowskie.
 
 */
