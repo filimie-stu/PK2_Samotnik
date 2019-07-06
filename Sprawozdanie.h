@@ -160,7 +160,7 @@ Błędy API modelu:
     1. "Error: cannot decrement score below 0!"
     2. "Error: jump history is full. Cannot add another record." 
     3. "Error: there are no recorded jumps to extract."
-    
+
 Błędy widoku:
 
     1. "Error: Unrecognized field type. Failed to convert to char."
@@ -174,7 +174,10 @@ Ogólne (z komentarzem):
     4. "Warning: Maximum number of observers, cannot add another one. " - Dodawania obserwatora nie powiodło się, gdyż przeznaczona na nie tablica została juz wypełniona.        
 
 
+
 \section testy Testy
+
+\subsection dane_wejsciowe Dane wejściowe
 
 Częścią programu najbardziej wrażliwą na czynniki zewnętrzne, a więc bezwzględnie wymagającą testowania jest format pliku wejściowego.
 W folderze 'tests' drzewa projektu znajdują się wzory plansz, dla których aplikacja została pomyślnie przetestowana.
@@ -191,6 +194,16 @@ Pełna lista nazw wyżej wspomnianych plików zaprezentowana jest także poniże
     9. unrecognized_char.board
 
 Zamieszczony został tam także plik o nazwie "win_test.board" umożliwiający osiągnięcie zwycięstwa w pojedynczym ruchu.
+
+\subsection wycieki_pamieci Wycieki pamięci
+
+Autor dołożył wszelkich starań, aby uniknąć wycieków pamięci podczas pracy programu, jednakże ze względu na wybraną architekturę i rozwiązania projektowe
+było to zadanie niełatwe.
+
+Po przetestowaniu programu pod tym kątem okazało się, iż ich występowanie jest wysoce prawdopodobne, jednakże jedną z przyczyn tego zjawiska 
+może być specyfika biblioteki GTK+. Wykorzystywanie zasobów zewnętrznych takich jak pliki .XML czy .css wydają się być
+przyczyną generowania fałszywych komunikatów o wyciekach pamięci przez program diagnostyczny (co tłumaczyłoby przynajmniej część występujących przypadków).       
+
 
 \section wnioski Wnioski
 

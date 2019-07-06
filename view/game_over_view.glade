@@ -1,36 +1,51 @@
-
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="2.24" />
+  <requires lib="gtk+" version="2.24"/>
   <!-- interface-naming-policy project-wide -->
   <object class="GtkWindow" id="gameOverWindow">
-    <property name="can_focus">False</property>
-    <property name="border_width">7</property>
-    <property name="title" translatable="yes">Game over</property>
-    <property name="resizable">False</property>
+    <property name="can_focus">True</property>
     <property name="modal">True</property>
-    <property name="window_position">center-on-parent</property>
-    <property name="default_width">200</property>
-    <property name="default_height">175</property>
-    <property name="destroy_with_parent">True</property>
-    <property name="type_hint">dialog</property>
-    <child internal-child="vbox">
-      <object class="GtkVBox" id="dialog-vbox1">
+    <property name="window-position">GTK_WIN_POS_CENTER</property>
+    <child>
+      <object class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="dialog-action_area1">
+        <child>
+          <object class="GtkLabel" id="primaryText">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
+            <property name="label" translatable="yes">You win/lose!</property>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="detailedDescription">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">You've reached your goal! Congratulations!
+/ There are no more possible moves!</property>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkHButtonBox" id="hbuttonbox1">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="layout_style">spread</property>
             <child>
-              <object class="GtkButton" id="playAgainBtn">
+              <object class="GtkButton" id="restartBtn">
                 <property name="label" translatable="yes">Play again</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="yalign">0.44999998807907104</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -55,53 +70,10 @@
           <packing>
             <property name="expand">True</property>
             <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkVBox" id="vbox1">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <child>
-              <object class="GtkLabel" id="primaryText">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="xpad">11</property>
-                <property name="ypad">3</property>
-                <property name="label" translatable="yes"></property>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="detailedDescription">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="yalign">0</property>
-                <property name="label" translatable="yes"></property>
-                <property name="justify">center</property>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>
     </child>
-    <action-widgets>
-      <action-widget response="0">playAgainBtn</action-widget>
-      <action-widget response="1">mainMenuBtn</action-widget>
-    </action-widgets>
   </object>
 </interface>

@@ -87,7 +87,7 @@ void MatchView_hide(MatchView *self)
 
 void private_loadMembersFromXML(MatchView *self)
 {
-    GtkBuilder *builder = gtk_builder_new_from_file("view/in_game_view.glade");
+    GtkBuilder *builder = gtk_builder_new_from_file("view/match_view.glade");
     self->window = GTK_WIDGET(gtk_builder_get_object(builder, "matchWindow"));
     self->mainMenuButton = GTK_WIDGET(gtk_builder_get_object(builder, "mainMenuBtn"));
     self->resetButton = GTK_WIDGET(gtk_builder_get_object(builder, "restartBtn"));

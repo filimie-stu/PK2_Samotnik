@@ -88,13 +88,13 @@ GameController *GameController_new(IModelFactory *modelFactory, IViewFactory *vi
 
 void GameController_endMatch(GameController *self)
 {
-    // IView_destroy(self->gameOverView, 1);
-    // self->gameOverView = NULL;
-    // IBoard_destroy(self->board, 1);
-    // self->board = NULL;
-    // IView_destroy(self->matchView, 1);
-    // self->matchView = NULL;
-    // GameController_mainMenu(self);
+    IView_destroy(self->gameOverView, 1);
+    self->gameOverView = NULL;
+    IBoard_destroy(self->board, 1);
+    self->board = NULL;
+    IView_destroy(self->matchView, 1);
+    self->matchView = NULL;
+    GameController_mainMenu(self);
 }
 
 void GameController_beginMatch(GameController *self, NewGameArgs settings)
@@ -187,7 +187,7 @@ void GameController_restartGame(GameController *self)
         IView_destroy(self->gameOverView, 1);
         self->gameOverView = NULL;
     }
-    
+
     GameController_beginMatch(self, self->lastUsedSettings);
     // IBoard_destroy(self->board, 1);
     // self->board = IModelFactory_createBoard(self->modelFactory, self->lastUsedSettings.boardFilename);
