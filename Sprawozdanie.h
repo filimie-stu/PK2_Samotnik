@@ -158,7 +158,9 @@ Błędy API kontrolera:
 Błędy API modelu:
 
     1. "Error: cannot decrement score below 0!"
-
+    2. "Error: jump history is full. Cannot add another record." 
+    3. "Error: there are no recorded jumps to extract."
+    
 Błędy widoku:
 
     1. "Error: Unrecognized field type. Failed to convert to char."

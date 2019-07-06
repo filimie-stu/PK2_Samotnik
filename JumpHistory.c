@@ -67,7 +67,11 @@ IJumpHistory *JumpHistory_asIJumpHistory(JumpHistory *self)
 }
 void JumpHistory_addRecord(JumpHistory *self, JumpInfo jump)
 {
-    assert(self->recordedCount < MAX_RECORDS);
+    if (self->recordedCount >= MAX_RECORDS)
+    {
+        printf("Error: jump history is full. Cannot add another record. \n");
+        return;
+    }
 
     self->recordedJumps[self->recordedCount] = jump;
     self->recordedCount++;
@@ -75,7 +79,11 @@ void JumpHistory_addRecord(JumpHistory *self, JumpInfo jump)
 JumpInfo JumpHistory_extract(JumpHistory *self)
 {
     if (self->recordedCount <= 0)
+    {
         printf("Error: there are no recorded jumps to extract.\n");
+        JumpInfo trash;
+        return trash;
+    };
 
     self->recordedCount--;
     return self->recordedJumps[self->recordedCount];

@@ -16,7 +16,7 @@ void JumpHistory_destroy(JumpHistory* self);
 /**
  * \memberof jump_history
  * \brief Usuwa i zwraca ostatnio dodany na stos obiekt typu JumpInfo.
- * \return Ostatnio dodany na stos obiekt, teraz zeń usunięty.
+ * \return Jeżeli operacja się powiodła - ostatnio dodany na stos obiekt, teraz zeń usunięty. W przeciwnym razie obiekt JumpInfo o nieokreślonych polach.
 */
 JumpInfo JumpHistory_extract(JumpHistory* self);
 
