@@ -23,7 +23,13 @@ oraz interakcję z użytkownikiem i koordynację pracy programu (Controller).
 
 Ostatnią kluczową decyzją projektową był wybór biblioteki, umożliwiającej realizację warstw widoku i kontrolera. 
 Ostatecznie wybrana została biblioteka GTK+ w wersji 3, umożliwiająca konstrukcję interfejsu użytkownika na bazie
-plików XML.   
+plików XML. 
+
+https://www.gtk.org/
+
+Do generowania większości plików XML posłużono się programem Glade, zintegrowanym z biblioteką GTK+.
+
+https://glade.gnome.org/
 
 Poniżej zaprezentowano rozwiązania i konwencje stosowane w kodzie źródłowym, mające na celu
 jak najlepsze oddanie poszczególnych popularnych koncepcji obiektowych, a także pomocnych przy budowaniu
@@ -201,9 +207,9 @@ Autor dołożył wszelkich starań, aby uniknąć wycieków pamięci podczas pra
 było to zadanie niełatwe.
 
 Po przetestowaniu programu pod tym kątem okazało się, iż ich występowanie jest wysoce prawdopodobne, jednakże jedną z przyczyn tego zjawiska 
-może być specyfika biblioteki GTK+. Wykorzystywanie zasobów zewnętrznych takich jak pliki .XML czy .css wydają się być
+może być specyfika biblioteki GTK+. Wykorzystywanie zasobów zewnętrznych takich jak pliki .XML czy .css wydaje się być
 przyczyną generowania fałszywych komunikatów o wyciekach pamięci przez program diagnostyczny (co tłumaczyłoby przynajmniej część występujących przypadków).       
-
+Niestety nie udało się stwierdzić jak duża część potencjalnych wycieków jest kwestią czynników zewnętrznych, a jak duża jest konsekwencją działań autora. 
 
 \section wnioski Wnioski
 
