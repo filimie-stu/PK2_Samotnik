@@ -1,4 +1,3 @@
-
 #pragma once
 #include "Common.h"
 #include "Vector2D.h"

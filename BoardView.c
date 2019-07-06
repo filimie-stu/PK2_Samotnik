@@ -23,6 +23,7 @@ typedef struct board_view
 
 } BoardView;
 
+
 typedef enum view_field_type
 {
     VIEW_TOKEN,

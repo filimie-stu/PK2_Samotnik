@@ -6,19 +6,22 @@
 #include "JumpInfo.h"
 #include "JumpHistory.h"
 
-typedef enum click_result
-{
-    NO_ACTION, 
-    JUMP,
-    ACTIVATE_TOKEN
-} ClickResult;
 
+/**
+ * \file Board.h
+ * \brief Plik nagłówkowy planszy.
+*/
+
+/**
+ * \enum direction
+ * \brief Reprezentuje cztery podstawowe kierunki.
+*/
 typedef enum direction
 {
-    UP = 0,
-    DOWN = 1,
-    LEFT = 2,
-    RIGHT = 3
+    UP = 0,     //!< góra.
+    DOWN = 1,   //!< dół.
+    LEFT = 2,   //!< lewo.
+    RIGHT = 3   //!< prawo.
 } Direction;
 
 
