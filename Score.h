@@ -1,16 +1,7 @@
 #pragma once
 #include "IScore.h"
 
-/**
- * \brief Model reprezentujący aktualny wynik.
-*/
-typedef struct score
-{
-    IScore* iScore;     //!< implementacja interfejsu IScore
-    int takedowns;      //!< licznik zbitych pionków.
-    int goal;           //!< liczba pionków, które należy zbić aby zwyciężyć.
-    int handicap;       //!< liczba pionków pomocniczych, których usunięcie z planszy nie będzie potrzebne do zwycięstwa.
-} Score;
+typedef struct score Score;
 
 /** \memberof score */ 
 Score* Score_new(int goal, int handicap);

@@ -30,7 +30,7 @@ static int private_wrapper_isEmpty(void *vSelf)
 }
 void private_wrapper_destroy(void *vSelf)
 {
-    //todo
+    JumpHistory_destroy((JumpHistory*)vSelf);
 }
 void private_wrapper_addRecord(void *vSelf, JumpInfo jumpData)
 {
@@ -58,6 +58,7 @@ JumpHistory *JumpHistory_new()
 }
 void JumpHistory_destroy(JumpHistory *self)
 {
+    IJumpHistory_destroy(self->iJumpHistory, 0);
     free(self);
 }
 IJumpHistory *JumpHistory_asIJumpHistory(JumpHistory *self)

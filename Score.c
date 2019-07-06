@@ -3,6 +3,19 @@
 #include "SyncScoreArgs.h"
 #include <stdlib.h>
 
+
+/**
+ * \brief Model reprezentujący aktualny wynik.
+*/
+typedef struct score
+{
+    IScore* iScore;     //!< implementacja interfejsu IScore
+    int takedowns;      //!< licznik zbitych pionków.
+    int goal;           //!< liczba pionków, które należy zbić aby zwyciężyć.
+    int handicap;       //!< liczba pionków pomocniczych, których usunięcie z planszy nie będzie potrzebne do zwycięstwa.
+} Score;
+
+
 static int private_wrapper_getPoints(void* vSelf);
 static int private_wrapper_getGoal(void* vSelf);
 static void private_wrapper_increment(void* vSelf);

@@ -22,10 +22,11 @@ StartupSettingsDialog *StartupSettingsDialog_newFromFile(const char* relativeFil
     created->filePickerBtn = GTK_WIDGET(gtk_builder_get_object(builder,"boardChooserBtn"));
     created->handicapSpinnerBtn = GTK_WIDGET(gtk_builder_get_object(builder,"handicapBtn"));
 
+    g_object_unref(builder);
+
     gtk_window_set_transient_for(GTK_WINDOW(created->dialog), parentWindow);
     gtk_spin_button_set_range(GTK_SPIN_BUTTON(created->handicapSpinnerBtn), 0, 5);
     gtk_spin_button_set_increments(GTK_SPIN_BUTTON(created->handicapSpinnerBtn), 1, 1);
-
     return created;
 }
 void StartupSettingsDialog_destroy(StartupSettingsDialog* self)
